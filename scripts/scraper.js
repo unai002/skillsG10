@@ -37,14 +37,14 @@ async function extraer() {
         });
 
         fs.writeFileSync('skills.json', JSON.stringify(data, null, 2));
-        console.log('Data saved to skills.json');
+        console.log('Se han guardado los datos en skills.json');
 
         await browser.close();
 
         return data;
 
     } catch (error) {
-        console.log("An error ocurred: ", error);
+        console.log("Ha ocurrido un error: ", error);
     }
 }
 
