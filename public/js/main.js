@@ -49,6 +49,7 @@ fetch('electronics/skills.json')
 
             svg.appendChild(text);
 
+
             // Añadir la imagen (icono) al SVG
             const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             image.setAttribute('x', '35%');
@@ -63,8 +64,33 @@ fetch('electronics/skills.json')
 
             // Añadir la envoltura al contenedor
             svgContainer.appendChild(svgWrapper);
+
         });
     })
     .catch(error => {
         console.error('Error al cargar el archivo JSON:', error);
     });
+
+window.onload = function() {
+    fetch('https://www.reshot.com/preview-assets/icons/U3A6CNXBDH/pencil-U3A6CNXBDH.svg')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text(); // Lee el contenido como texto
+        })
+        .then(svgContent => {
+            const containers = document.querySelectorAll('.svg-wrapper');
+            containers.forEach((cont) => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = svgContent;
+                const svgElement = tempDiv.firstChild;
+                svgElement.classList.add('emojiContainer')
+                // Agregar el elemento SVG al contenedor
+                cont.appendChild(svgElement);
+            })
+        })
+        .catch(error => {
+            console.error('Error al cargar el SVG:', error);
+        });
+};
