@@ -32,7 +32,7 @@ fetch('electronics/skills.json')
             text.setAttribute('y', '20%');
             text.setAttribute('text-anchor', 'middle');
             text.setAttribute('fill', 'black');
-            text.setAttribute('fontsize', '10');
+            text.setAttribute('font-size', '9.5');
 
             // Dividir el texto en líneas
             const lines = skill.text.split('\n');
@@ -45,7 +45,6 @@ fetch('electronics/skills.json')
                 tspan.setAttribute('font-weight', 'bold');
                 tspan.textContent = line;
                 text.appendChild(tspan);
-                dy += 1.2; // Espaciado entre las líneas
             });
 
             svg.appendChild(text);
