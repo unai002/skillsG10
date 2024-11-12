@@ -3,11 +3,12 @@ const path = require("path");
 const {promises: fs} = require("fs");
 const baseurl = "https://raw.githubusercontent.com/Obijuan/digital-electronics-with-open-FPGAs-tutorial/master/rangos/png/";
 
+// Indices del rango de tablas donde se encuentran las medallas
 const indiceTablaInicio = 6;
 const indiceTablaFin = 11;
 
 // Indicamos el directorio donde guardar los iconos y lo creamos si no existe
-const saveDirectory = path.resolve(__dirname, '..', 'badges');
+const saveDirectory = path.resolve(__dirname, '..', 'public', 'badges');
 (async () => {
     try {
         await fs.mkdir(saveDirectory, { recursive: true });
@@ -25,8 +26,8 @@ async function extractTablesInRange(startIndex, endIndex) {
 
         await page.goto(url, { waitUntil: 'networkidle0' });
 
-        let bitpointCount = 0;
-        let allTablesData = [];
+        let bitpointCount = 0; // Para determinar el rango de bitpoints de cada medalla
+        let allTablesData = []; // Para guardar los datos de todas las medallas en un único array
 
         const { tablesData, updatedBitpointCount } = await page.evaluate((startIndex, endIndex, bitpointCount) => {
             const tables = document.querySelectorAll('table');
@@ -41,6 +42,7 @@ async function extractTablesInRange(startIndex, endIndex) {
                 rows.shift(); // Quitamos la cabecera de la tabla (primera fila)
                 const tableData = rows.map((row) => {
                     const cells = Array.from(row.querySelectorAll('td, th'));
+                    // Devolvemos los datos necesarios
                     const rowData = {
                         "rango": cells[2].innerText.trim(),
                         "bitpoints-min": bitpointCount.toString(),
@@ -63,8 +65,8 @@ async function extractTablesInRange(startIndex, endIndex) {
 
         await browser.close();
 
-        await fs.writeFile('badges.json', JSON.stringify(allTablesData, null, 2));
-        console.log('Se han guardado los datos en badges.json');
+        await fs.writeFile(path.resolve(__dirname, '..', 'public', 'badges', 'badges.json'), JSON.stringify(allTablesData, null, 2));
+        console.log('Se han guardado los datos en public/badges/badges.json');
 
         await downloadAllBadges(allTablesData);
 

@@ -4,7 +4,7 @@ const path = require('path');
 const url = 'https://tinkererway.dev/web_skill_trees/electronics_skill_tree';
 
 // Indicamos el directorio donde guardar los iconos y lo creamos si no existe
-const saveDirectory = path.resolve(__dirname, '..', 'electronics', 'icons');
+const saveDirectory = path.resolve(__dirname, '..', 'public', 'electronics', 'icons');
 (async () => {
     try {
         await fs.mkdir(saveDirectory, { recursive: true });

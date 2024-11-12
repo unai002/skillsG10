@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const path = require("path");
 
 const url = 'https://tinkererway.dev/web_skill_trees/electronics_skill_tree';
 
@@ -36,7 +37,7 @@ async function extraer() {
 
         });
 
-        fs.writeFileSync('skills.json', JSON.stringify(data, null, 2));
+        fs.writeFileSync(path.resolve(__dirname, '..', 'public', 'electronics', 'skills.json'), JSON.stringify(data, null, 2));
         console.log('Se han guardado los datos en skills.json');
 
         await browser.close();

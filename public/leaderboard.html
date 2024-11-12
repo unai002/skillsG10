@@ -40,7 +40,7 @@
 <script>
     async function loadLeaderboard() {
         try {
-            const response = await fetch('scripts/badges.json');
+            const response = await fetch('badges/badges.json');
             const data = await response.json();
 
             const tbody = document.getElementById('leaderboard-body');
@@ -53,7 +53,7 @@
 
                 const badgeCell = document.createElement('td');
                 const img = document.createElement('img');
-                img.src = `../badges/${item.png.replace('.png', '-min.png')}`;
+                img.src = `badges/${item.png.replace('.png', '-min.png')}`;
                 badgeCell.appendChild(img);
                 row.appendChild(badgeCell);
 
