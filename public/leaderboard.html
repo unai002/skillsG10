@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 50px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Leaderboard</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Rango</th>
+        <th>Badge</th>
+        <th>Required Bitpoints</th>
+    </tr>
+    </thead>
+    <tbody id="leaderboard-body">
+    <!-- Data will be inserted here by JavaScript -->
+    </tbody>
+</table>
+
+<script>
+    async function loadLeaderboard() {
+        try {
+            const response = await fetch('scripts/badges.json');
+            const data = await response.json();
+
+            const tbody = document.getElementById('leaderboard-body');
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                const rangoCell = document.createElement('td');
+                rangoCell.textContent = item.rango;
+                row.appendChild(rangoCell);
+
+                const badgeCell = document.createElement('td');
+                const img = document.createElement('img');
+                img.src = `../badges/${item.png.replace('.png', '-min.png')}`;
+                badgeCell.appendChild(img);
+                row.appendChild(badgeCell);
+
+                const bitpointsCell = document.createElement('td');
+                bitpointsCell.textContent = `${item['bitpoints-min']} - ${item['bitpoints-max']}`;
+                row.appendChild(bitpointsCell);
+
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading leaderboard data:', error);
+        }
+    }
+
+    loadLeaderboard();
+</script>
+</body>
+</html>

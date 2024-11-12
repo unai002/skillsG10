@@ -1,13 +1,17 @@
 const puppeteer = require('puppeteer');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const url = 'https://tinkererway.dev/web_skill_trees/electronics_skill_tree';
 
 // Indicamos el directorio donde guardar los iconos y lo creamos si no existe
-const saveDirectory = path.join(__dirname, '..', 'public', 'electronics', 'icons');
-if (!fs.existsSync(saveDirectory)) {
-    fs.mkdirSync(saveDirectory, { recursive: true });
-}
+const saveDirectory = path.resolve(__dirname, '..', 'electronics', 'icons');
+(async () => {
+    try {
+        await fs.mkdir(saveDirectory, { recursive: true });
+    } catch (error) {
+        console.error(`Error al crear directorio: ${error.message}`);
+    }
+})();
 
 async function getIconUrls() {
     try {
@@ -52,7 +56,7 @@ async function downloadIcon(page, url, index) {
         const filePath = path.join(saveDirectory, `icon${index + 1}.svg`);
 
         // El objeto Buffer podemos guardarlo en un archivo
-        fs.writeFileSync(filePath, iconData);
+        await fs.writeFile(filePath, iconData);
         console.log(`Icono ${index + 1} descargado con éxito: ${filePath}`);
 
     } catch (error) {
@@ -69,12 +73,13 @@ async function downloadAllIcons() {
 
     for (let i = 0; i < iconUrls.length; i++) {
         await downloadIcon(page, iconUrls[i], i);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Add a 1-second delay between downloads
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    console.log("All icons have been downloaded");
+    console.log("Se han descargado todos los iconos.");
 
     await browser.close();
 }
 
 downloadAllIcons();
+
