@@ -5,12 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skill description</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/skillspecifics.js"></script>
+  <script src="js/skillspecifics.js" defer></script>
 </head>
 <body>
 <div class="skill-details">
-  <h1 id="title">Especificaciones de la Competencia</h1>
-  <p id="skill-description"></p>
+  <div class="page-simulation">
+    <table class="skill-table">
+      <tr>
+        <td class="hexagon-column">
+          <div class="hexagon-container"></div> <!-- Add this div -->
+        </td>
+        <td class="info-column">
+          <h1 id="title" class="info-header">Especificaciones de la Competencia</h1>
+          <p id="skill-description"></p>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
 </body>
 </html>

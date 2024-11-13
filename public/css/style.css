@@ -152,6 +152,44 @@ h1 {
   font-size: 1em;
   display: none; /* Initially hidden */
 }
+
+.page-simulation {
+  width: 60%; /* Adjust width as needed */
+  aspect-ratio: 3 / 4; /* Maintain a vertical rectangle aspect ratio */
+  margin: 0 auto; /* Center horizontally */
+  background-color: white; /* Background color of the simulated page */
+  border: 1px solid #ccc; /* Border to simulate the page */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for a 3D effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.skill-table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+}
+
+.hexagon-column {
+  width: 20%; /* Adjust width as needed */
+  vertical-align: top;
+}
+
+.hexagon-container {
+  margin-top: 20%; /* Adjust margin as needed */
+}
+
+.info-header {
+  margin-top: 10%; /* Adjust margin as needed */
+}
+
+.info-column {
+  width: 80%; /* Adjust width as needed */
+  vertical-align: top;
+  padding-left: 20px; /* Add some padding for better readability */
+}
+
 /* Footer styles */
 footer {
 
