@@ -8,6 +8,7 @@ fetch('electronics/skills.json')
 
         // Iterate over each skill and create the panel dynamically
         skills.forEach(skill => {
+
             // Create a div to wrap the SVG and content
             const svgWrapper = document.createElement('div');
             svgWrapper.classList.add('svg-wrapper');
