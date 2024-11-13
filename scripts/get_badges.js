@@ -29,7 +29,8 @@ async function extractTablesInRange(startIndex, endIndex) {
         let bitpointCount = 0; // Para determinar el rango de bitpoints de cada medalla
         let allTablesData = []; // Para guardar los datos de todas las medallas en un único array
 
-        const { tablesData, updatedBitpointCount } = await page.evaluate((startIndex, endIndex, bitpointCount) => {
+        const { tablesData, updatedBitpointCount } = await page.evaluate(
+            (startIndex, endIndex, bitpointCount) => {
             const tables = document.querySelectorAll('table');
 
             // De todas las tablas, seleccionamos las que están en el rango que queremos
@@ -65,7 +66,8 @@ async function extractTablesInRange(startIndex, endIndex) {
 
         await browser.close();
 
-        await fs.writeFile(path.resolve(__dirname, '..', 'public', 'badges', 'badges.json'), JSON.stringify(allTablesData, null, 2));
+        await fs.writeFile(path.resolve(__dirname, '..', 'public', 'badges', 'badges.json'),
+            JSON.stringify(allTablesData, null, 2));
         console.log('Se han guardado los datos en public/badges/badges.json');
 
         await downloadAllBadges(allTablesData);

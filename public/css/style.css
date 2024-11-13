@@ -1,4 +1,4 @@
-                              body {
+body {
   font-family: Arial, sans-serif;
   padding: 20px;
   background-color: #f0f0f0;
@@ -102,15 +102,28 @@ h1 {
   fill: var(--selected-color, yellow);
 }
 
-.emojiContainer{
+
+.emojiContainer {
   display: none;
   position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5)); /* Custom-shaped shadow */
+}
+
+.emojiLapiz {
   width: 30%;
   height: 30%;
   top: 75%;
   left: 80%;
-  transform: translate(-50%, -50%);
-  font-size: 10px;
+}
+
+.emojiCuaderno {
+  position:absolute;
+  width: 30%;
+  height: 30%;
+  top: 75%;
+  left: 20%;
 }
 
 @media print {

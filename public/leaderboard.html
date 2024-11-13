@@ -21,6 +21,44 @@
             height: auto;
         }
     </style>
+
+    <script>
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('badges/badges.json');
+                const data = await response.json();
+
+                const tbody = document.getElementById('leaderboard-body');
+                data.forEach((item, index) => {
+                    const row = document.createElement('tr');
+
+                    const rangoCell = document.createElement('td');
+                    rangoCell.textContent = item.rango;
+                    row.appendChild(rangoCell);
+
+                    const badgeCell = document.createElement('td');
+                    const img = document.createElement('img');
+                    img.src = `badges/${item.png.replace('.png', '-min.png')}`;
+                    badgeCell.appendChild(img);
+                    row.appendChild(badgeCell);
+
+                    const bitpointsCell = document.createElement('td');
+                    if (index === data.length - 1) {
+                        bitpointsCell.textContent = `${item['bitpoints-min']} <`;
+                    } else {
+                        bitpointsCell.textContent = `${item['bitpoints-min']} - ${item['bitpoints-max']}`;
+                    }
+                    row.appendChild(bitpointsCell);
+
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading leaderboard data:', error);
+            }
+        }
+
+        window.onload = loadLeaderboard;
+    </script>
 </head>
 <body>
 <h1>Leaderboard</h1>
@@ -33,42 +71,7 @@
     </tr>
     </thead>
     <tbody id="leaderboard-body">
-    <!-- Data will be inserted here by JavaScript -->
     </tbody>
 </table>
-
-<script>
-    async function loadLeaderboard() {
-        try {
-            const response = await fetch('badges/badges.json');
-            const data = await response.json();
-
-            const tbody = document.getElementById('leaderboard-body');
-            data.forEach(item => {
-                const row = document.createElement('tr');
-
-                const rangoCell = document.createElement('td');
-                rangoCell.textContent = item.rango;
-                row.appendChild(rangoCell);
-
-                const badgeCell = document.createElement('td');
-                const img = document.createElement('img');
-                img.src = `badges/${item.png.replace('.png', '-min.png')}`;
-                badgeCell.appendChild(img);
-                row.appendChild(badgeCell);
-
-                const bitpointsCell = document.createElement('td');
-                bitpointsCell.textContent = `${item['bitpoints-min']} - ${item['bitpoints-max']}`;
-                row.appendChild(bitpointsCell);
-
-                tbody.appendChild(row);
-            });
-        } catch (error) {
-            console.error('Error loading leaderboard data:', error);
-        }
-    }
-
-    loadLeaderboard();
-</script>
 </body>
 </html>
