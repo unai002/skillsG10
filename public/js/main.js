@@ -86,17 +86,23 @@ function eventManager() {
     // Click en el cuaderno para abrir descripcion
     document.querySelectorAll('.svg-wrapper').forEach(wrapper => {
         const cuaderno = wrapper.querySelector('.emojiCuaderno');
-        console.log(cuaderno)
         if (cuaderno) {
-            console.log("el cuaderno existe")
             cuaderno.addEventListener('click', (event) => {
                 const skillId = wrapper.getAttribute('data-id');
                 localStorage.setItem('skillId', skillId);
+                storeSkillHexagon(wrapper);
                 window.location.href = 'skillspecifics.html';
             });
         }
     });
 
+}
+
+function storeSkillHexagon(wrapper) {
+    const svgElement = wrapper.querySelector('svg');
+    if (svgElement) {
+        localStorage.setItem('skillHexagon', svgElement.outerHTML);
+    }
 }
 
 function createLowerBanner() {
