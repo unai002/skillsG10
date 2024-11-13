@@ -1,6 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   padding: 20px;
+  padding-bottom: 70px;
   background-color: #f0f0f0;
 }
 
@@ -138,6 +139,19 @@ h1 {
   }
 }
 
+.description-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: rgb(234, 225, 107);
+  color: black;
+  text-align: center;
+  padding: 1.5%; /* Adjust percentage as needed */
+  font-size: 1em;
+  display: none; /* Initially hidden */
+}
 /* Footer styles */
 footer {
 

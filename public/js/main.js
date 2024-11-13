@@ -69,6 +69,44 @@ fetch('electronics/skills.json')
         console.error('Error loading the JSON file:', error);
     });
 
+function eventManager() {
+
+    // Descripcion de la competencia
+    document.querySelectorAll('.svg-wrapper').forEach(wrapper => {
+        wrapper.addEventListener('mouseover', () => {
+            let banner = document.querySelector('.description-banner');
+            banner.style.display = 'block';
+            banner.innerHTML = `Descripción de la tarea: ${wrapper.getAttribute('data-id')}`;
+        });
+        wrapper.addEventListener('mouseout', () => {
+            document.querySelector('.description-banner').style.display = 'none';
+        });
+    });
+
+    // Click en el cuaderno para abrir descripcion
+    document.querySelectorAll('.svg-wrapper').forEach(wrapper => {
+        const cuaderno = wrapper.querySelector('.emojiCuaderno');
+        console.log(cuaderno)
+        if (cuaderno) {
+            console.log("el cuaderno existe")
+            cuaderno.addEventListener('click', (event) => {
+                const skillId = wrapper.getAttribute('data-id');
+                localStorage.setItem('skillId', skillId);
+                window.location.href = 'skillspecifics.html';
+            });
+        }
+    });
+
+}
+
+function createLowerBanner() {
+    // Create the banner element and append it to the body
+    const descriptionBanner = document.createElement('div');
+    descriptionBanner.id = 'description-banner';
+    descriptionBanner.classList.add('description-banner');
+    document.body.appendChild(descriptionBanner);
+}
+
 function appendEmoji(svgContent, className) {
     const containers = document.querySelectorAll('.svg-wrapper');
     containers.forEach((cont) => {
@@ -102,8 +140,11 @@ window.onload = function() {
         .then(([pencilSvg, notebookSvg]) => {
             appendEmoji(pencilSvg, 'emojiLapiz');
             appendEmoji(notebookSvg, 'emojiCuaderno');
+            eventManager();
         })
         .catch(error => {
             console.error('Error loading the SVGs:', error);
         });
+
+    createLowerBanner();
 };
