@@ -153,7 +153,7 @@ window.onload = function() {
         .then(([pencilSvg, notebookSvg]) => {
             appendEmoji(pencilSvg, 'emojiLapiz');
             appendEmoji(notebookSvg, 'emojiCuaderno');
-            appendEmoji(redNotificationSvg, 'redNotification');
+            //appendEmoji(redNotificationSvg, 'redNotification');
             eventManager();
         })
         .catch(error => {
