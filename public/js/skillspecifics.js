@@ -37,6 +37,11 @@ function loadInformation() {
             textBoxTittle.style.display = 'block';
             textBox.style.display = 'block';
             buttonSubmit.style.display = 'block';
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
         } else {
             textBoxTittle.style.display = 'none';
             textBox.style.display = 'none';
