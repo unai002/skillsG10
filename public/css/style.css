@@ -11,6 +11,68 @@ h1 {
   margin-bottom: 20px;
 }
 
+h2 {
+  text-align: left;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+h3 {
+  text-align: left;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+h4 {
+  margin-left: 30%;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+h5 {
+  margin-left: 20%;
+  font-size: 0.5em;
+  margin-bottom: 20px;
+}
+
+h6 {
+  text-align: left;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  display: none;
+}
+
+#textBox {
+  display: none;
+  margin-top: 10px;
+  width: 80%;
+  height: 50px;
+  font-size: 8px;
+  padding: 8px;
+  box-sizing: content-box;
+}
+
+.buttonSubmit {
+  background-color: #31cd31; /* Color de fondo verde */
+  color: white; /* Color del texto blanco */
+  border: none; /* Sin bordes */
+  margin-top: 10px;
+  width: 100px; /* Ancho del botón */
+  height: 35px; /* Alto del botón (hace el botón cuadrado) */
+  border-radius: 5px;
+  font-size: 10px; /* Tamaño del texto */
+  cursor: pointer; /* Cambia el cursor cuando pasa sobre el botón */
+  display: block;
+  justify-content: center;
+  align-items: center;
+
+  margin-left: 30%;
+}
+
+.buttonSubmit:hover {
+  background-color: #0e680e;
+}
+
 .skill-tree {
   text-align: center;
   margin-bottom: 20px;
@@ -127,6 +189,17 @@ h1 {
   left: 20%;
 }
 
+.redNotification {
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 @media print {
   .color-picker {
     display: none;
@@ -188,6 +261,22 @@ h1 {
   width: 80%; /* Adjust width as needed */
   vertical-align: top;
   padding-left: 20px; /* Add some padding for better readability */
+}
+
+/* Estilos para mejorar la presentación de la lista */
+.checkbox-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.checkbox-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.checkbox-list input[type="checkbox"] {
+  margin-right: 8px;
 }
 
 /* Footer styles */

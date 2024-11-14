@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skill description</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fontawesome/6.0.0-beta3/css/all.min.css">
   <script src="js/skillspecifics.js" defer></script>
 </head>
 <body>
@@ -13,11 +14,31 @@
     <table class="skill-table">
       <tr>
         <td class="hexagon-column">
-          <div class="hexagon-container"></div> <!-- Add this div -->
+          <div class="hexagon-container"></div>
         </td>
         <td class="info-column">
-          <h1 id="title" class="info-header">Especificaciones de la Competencia</h1>
-          <p id="skill-description"></p>
+          <h2 id="title" class="info-header"></h2>
+          <h3 id="subtittle" class="info-header">Skill score: 1 point</h3>
+          <h4 id="description"> Description </h4>
+          <h5 id="descriptionText" class="descriptionText"> Description of the skill not developed yet </h5>
+          <h3>Task to Complete</h3>
+          <ul class="checkbox-list">
+            <li><input type="checkbox" class="checkbox" id="task1"><label for="task1">Tarea 1</label></li>
+            <li><input type="checkbox" class="checkbox" id="task2"><label for="task2">Tarea 2</label></li>
+            <li><input type="checkbox" class="checkbox" id="task3"><label for="task3">Tarea 3</label></li>
+            <li><input type="checkbox" class="checkbox" id="task4"><label for="task4">Tarea 4</label></li>
+            <li><input type="checkbox" class="checkbox" id="task5"><label for="task5">Tarea 5</label></li>
+          </ul>
+
+          <h6 id="textBoxTittle" class="textBoxTittle">Provide Evidence</h6>
+          <input type="text" id="textBox" placeholder="Enter an URL or an explanation as evidence for completing this skill">
+          <button id="buttonSubmit" class="buttonSubmit">Submit Evidences</button>
+          <h3>Resources</h3>
+          <ul class="list">
+            <li>Resources 1</label></li>
+            <li>Resources 2</label></li>
+            <li>Resources 3</label></li>
+          </ul>
         </td>
       </tr>
     </table>

@@ -143,10 +143,17 @@ window.onload = function() {
             return response.text();
         });
 
+    const redNotificationSvg = document.createElementNS('http://www.w3.org/2000/svg', 'redNotification');
+    redNotificationSvg.setAttribute('width', '20px');
+    redNotificationSvg.setAttribute('height', '20px');
+    redNotificationSvg.setAttribute('background-color', 'red');
+    redNotificationSvg.setAttribute('border-radius', '50%');
+
     Promise.all([fetchPencil, fetchNotebook])
         .then(([pencilSvg, notebookSvg]) => {
             appendEmoji(pencilSvg, 'emojiLapiz');
             appendEmoji(notebookSvg, 'emojiCuaderno');
+            appendEmoji(redNotificationSvg, 'redNotification');
             eventManager();
         })
         .catch(error => {
