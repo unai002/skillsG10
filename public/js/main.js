@@ -1,33 +1,24 @@
-// main.js
-
+// CONSTRUCCIÓN DE LOS HEXÁGONOS
 fetch('electronics/skills.json')
     .then(response => response.json())
     .then(skills => {
-        // Select the container where the SVGs will be added
         const svgContainer = document.querySelector('.svg-container');
-
-        // Iterate over each skill and create the panel dynamically
         skills.forEach(skill => {
-
-            // Create a div to wrap the SVG and content
             const svgWrapper = document.createElement('div');
             svgWrapper.classList.add('svg-wrapper');
             svgWrapper.setAttribute('data-id', skill.id);
             svgWrapper.setAttribute('data-custom', 'false');
 
-            // Create the SVG
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('width', '100');
             svg.setAttribute('height', '100');
             svg.setAttribute('viewBox', '0 0 100 100');
 
-            // Create the hexagon
             const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
             polygon.setAttribute('points', '50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5');
             polygon.classList.add('hexagon');
             svg.appendChild(polygon);
 
-            // Create the text inside the SVG
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', '50%');
             text.setAttribute('y', '20%');
@@ -35,10 +26,8 @@ fetch('electronics/skills.json')
             text.setAttribute('fill', 'black');
             text.setAttribute('font-size', '9.5');
 
-            // Split the text into lines
             const lines = skill.text.split('\n');
             let dy = 1.2;
-
             lines.forEach((line, index) => {
                 const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
                 tspan.setAttribute('x', '50%');
@@ -50,19 +39,15 @@ fetch('electronics/skills.json')
 
             svg.appendChild(text);
 
-            // Add the image (icon) to the SVG
             const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             image.setAttribute('x', '35%');
             image.setAttribute('y', '60%');
             image.setAttribute('width', '30');
             image.setAttribute('height', '30');
-            image.setAttribute('href', `../electronics/icons/${skill.icon}`);  // Correct path for icons
+            image.setAttribute('href', `../electronics/icons/${skill.icon}`);
             svg.appendChild(image);
 
-            // Add the SVG to the wrapper
             svgWrapper.appendChild(svg);
-
-            // Add the wrapper to the container
             svgContainer.appendChild(svgWrapper);
         });
     })
@@ -70,9 +55,9 @@ fetch('electronics/skills.json')
         console.error('Error loading the JSON file:', error);
     });
 
-function eventManager() {
+// FUNCIONES
 
-    // Descripcion de la competencia
+function eventManager() {
     document.querySelectorAll('.svg-wrapper').forEach(wrapper => {
         wrapper.addEventListener('mouseover', () => {
             let banner = document.querySelector('.description-banner');
@@ -84,7 +69,6 @@ function eventManager() {
         });
     });
 
-    // Click en el cuaderno para abrir descripcion
     document.querySelectorAll('.svg-wrapper').forEach(wrapper => {
         const cuaderno = wrapper.querySelector('.emojiCuaderno');
         if (cuaderno) {
@@ -96,7 +80,6 @@ function eventManager() {
             });
         }
     });
-
 }
 
 function storeSkillHexagon(wrapper) {
@@ -106,8 +89,21 @@ function storeSkillHexagon(wrapper) {
     }
 }
 
+function loadRedDots() {
+    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
+
+    for (let skillId in evidencias) {
+        const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skillId}"]`);
+        if (svgWrapper) {
+            const redDot = document.createElement('div');
+            redDot.classList.add('redNotification');
+            redDot.innerText = evidencias[skillId]; // Update the number inside the red dot
+            svgWrapper.appendChild(redDot);
+        }
+    }
+}
+
 function createLowerBanner() {
-    // Create the banner element and append it to the body
     const descriptionBanner = document.createElement('div');
     descriptionBanner.id = 'description-banner';
     descriptionBanner.classList.add('description-banner');
@@ -143,17 +139,10 @@ window.onload = function() {
             return response.text();
         });
 
-    const redNotificationSvg = document.createElementNS('http://www.w3.org/2000/svg', 'redNotification');
-    redNotificationSvg.setAttribute('width', '20px');
-    redNotificationSvg.setAttribute('height', '20px');
-    redNotificationSvg.setAttribute('background-color', 'red');
-    redNotificationSvg.setAttribute('border-radius', '50%');
-
     Promise.all([fetchPencil, fetchNotebook])
         .then(([pencilSvg, notebookSvg]) => {
             appendEmoji(pencilSvg, 'emojiLapiz');
             appendEmoji(notebookSvg, 'emojiCuaderno');
-            //appendEmoji(redNotificationSvg, 'redNotification');
             eventManager();
         })
         .catch(error => {
@@ -161,4 +150,5 @@ window.onload = function() {
         });
 
     createLowerBanner();
+    loadRedDots();
 };
