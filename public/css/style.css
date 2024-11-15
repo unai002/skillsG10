@@ -52,6 +52,27 @@ h6 {
   box-sizing: content-box;
 }
 
+.backButton {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.backButton:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.backButton:active {
+  background-color: #004494;
+  transform: scale(1);
+}
+
 .redNotification {
   width: 20px;
   height: 20px;
@@ -70,24 +91,30 @@ h6 {
 }
 
 .buttonSubmit {
-  background-color: #31cd31; /* Color de fondo verde */
-  color: white; /* Color del texto blanco */
-  border: none; /* Sin bordes */
+  background-color: #31cd31; /* Green background color */
+  color: white; /* White text color */
+  border: none; /* No border */
   margin-top: 10px;
-  width: 20%; /* Ancho del botón */
-  height: 35px; /* Alto del botón (hace el botón cuadrado) */
+  width: 20%; /* Button width */
+  height: 35px; /* Button height */
   border-radius: 5px;
-  font-size: 15px; /* Tamaño del texto */
-  cursor: pointer; /* Cambia el cursor cuando pasa sobre el botón */
+  font-size: 15px; /* Text size */
+  cursor: pointer; /* Pointer cursor on hover */
   display: none;
   justify-content: center;
   align-items: center;
-
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Transition for background color and transform */
   margin-left: 30%;
 }
 
 .buttonSubmit:hover {
-  background-color: #0e680e;
+  background-color: #0e680e; /* Darker green on hover */
+  transform: scale(1.05); /* Slightly increase size on hover */
+}
+
+.buttonSubmit:active {
+  background-color: #0b4d0b; /* Even darker green on click */
+  transform: scale(1); /* Reset size on click */
 }
 
 .skill-tree {

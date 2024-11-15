@@ -18,7 +18,7 @@ function loadInformation() {
             const skillFind = skills.find(item => (item.id).toString() === localStorage.getItem('skillId'));
 
             if (skillFind) {
-                text = (skillFind.text).replace(/\n/g, " ");
+                let text = (skillFind.text).replace(/\n/g, " ");
                 title.innerText = 'Skill: ' + text;
             } else {
                 console.log("No se encontró el objeto con el ID especificado");
@@ -29,6 +29,7 @@ function loadInformation() {
     const textBoxTittle = document.getElementById('textBoxTitle');
     const textBox = document.getElementById('textBox');
     const buttonSubmit = document.getElementById('buttonSubmit');
+    const backButton = document.getElementById('backButton');
 
     function ckeckBoxVerify() {
         const allCheck = Array.from(checkboxes).every(checkbox => checkbox.checked);
@@ -47,6 +48,22 @@ function loadInformation() {
             textBox.style.display = 'none';
             buttonSubmit.style.display = 'none';
         }
+
+        // Save the state of checkboxes
+        const taskStates = Array.from(checkboxes).map(checkbox => checkbox.checked);
+        let localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
+        localTasksCompleted[localStorage.getItem('skillId')] = taskStates;
+        localStorage.setItem('localTasksCompleted', JSON.stringify(localTasksCompleted));
+    }
+
+    // Load the state of checkboxes
+    const localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
+    const savedTaskStates = localTasksCompleted[localStorage.getItem('skillId')];
+    if (savedTaskStates) {
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.checked = savedTaskStates[index];
+        });
+        ckeckBoxVerify(); // Update the UI based on loaded state
     }
 
     checkboxes.forEach(checkbox => {
@@ -64,6 +81,10 @@ function loadInformation() {
         }
 
         localStorage.setItem('evidencias', JSON.stringify(evidencias));
+    });
+
+    backButton.addEventListener('click', () => {
+        window.location.href = '/';
     });
 
 }
