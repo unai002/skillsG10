@@ -39,7 +39,7 @@ function loadInformation() {
             textBox.style.display = 'block';
             buttonSubmit.style.display = 'block';
             confetti({
-                particleCount: 100,
+                particleCount: 150,
                 spread: 70,
                 origin: { y: 0.6 }
             });
