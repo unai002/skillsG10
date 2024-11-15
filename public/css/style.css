@@ -90,6 +90,23 @@ h6 {
   font-size: 12px;
 }
 
+.greenNotification {
+  width: 20px;
+  height: 20px;
+  background-color: #31cd31;
+  filter: drop-shadow(0 0 4px rgb(49, 205, 49)); /* Custom-shaped shadow */
+  border-radius: 50%;
+  position: absolute;
+  top: 5%;
+  left: 78%; /* Adjusted to move it more to the left */
+  transform: translateX(-50%);
+  color: white;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
 .buttonSubmit {
   background-color: #31cd31; /* Green background color */
   color: white; /* White text color */
@@ -346,6 +363,65 @@ h6 {
 
 #welcomeMessage {
   margin-left: 10px; /* Add margin to separate the message from the button */
+}
+
+/* Make all text smaller */
+body {
+  font-size: 14px;
+}
+
+.skill-details h2,
+.skill-details h3,
+.skill-details h6,
+.skill-details p,
+.skill-details ul,
+.skill-details input,
+.skill-details button {
+  font-size: 14px;
+}
+
+/* Style the evidence table */
+#evidenceTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#evidenceTable th,
+#evidenceTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#evidenceTable th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+#evidenceTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#evidenceTable tr:hover {
+  background-color: #ddd;
+}
+
+#evidenceTable button {
+  padding: 5px 10px;
+  margin: 2px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+#evidenceTable button.reject-btn {
+  background-color: #f44336;
+}
+
+#evidenceTable button:hover {
+  opacity: 0.8;
 }
 
 /* Footer styles */

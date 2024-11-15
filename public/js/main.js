@@ -89,16 +89,59 @@ function storeSkillHexagon(wrapper) {
     }
 }
 
+function approveEvidence(skillId) {
+    console.log("esta llamando a approveskill")
+    const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skillId}"]`);
+    const hex = svgWrapper.getElementsByClassName('hexagon')[0];
+    if (hex) {
+        hex.style.fill = '#2afa2a';
+        console.log("hexagono en verde")
+    }
+    const redDot = svgWrapper.getElementsByClassName('redNotification')[0];
+    const greenDot = svgWrapper.getElementsByClassName('greenNotification')[0];
+
+    if (redDot) {
+        redDot.style.display = 'none';
+    }
+
+    if (greenDot) {
+        greenDot.style.display = 'flex';
+    }
+}
+
+
 function loadRedDots() {
-    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
+    let evidencias = localStorage.getItem('evidencias');
+    const currentUser = localStorage.getItem('currentUser'); // Retrieve currentUser from localStorage
+
+    try {
+        evidencias = JSON.parse(evidencias) || {};
+    } catch (error) {
+        console.error('Error parsing JSON data:', error);
+        return;
+    }
 
     for (let skillId in evidencias) {
-        const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skillId}"]`);
-        if (svgWrapper) {
-            const redDot = document.createElement('div');
-            redDot.classList.add('redNotification');
-            redDot.innerText = evidencias[skillId]; // Update the number inside the red dot
-            svgWrapper.appendChild(redDot);
+        const evidenceList = evidencias[skillId];
+        const evidenceCount = evidenceList.length;
+        if (evidenceCount > 0) {
+            const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skillId}"]`);
+            if (svgWrapper) {
+                const redDot = document.createElement('div');
+                const greenDot = document.createElement('div');
+                redDot.classList.add('redNotification');
+                greenDot.classList.add('greenNotification');
+                redDot.innerText = evidenceCount;
+                greenDot.innerText = evidenceCount;
+                svgWrapper.appendChild(redDot);
+                svgWrapper.appendChild(greenDot);
+
+                // Check if the evidence for the current user is approved and call approveEvidence
+                const userEvidence = evidenceList.find(evidence => evidence.username === currentUser);
+                if (userEvidence && userEvidence.approved) {
+                    approveEvidence(skillId);
+                }
+            }
         }
     }
 }

@@ -3,6 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyUserButton = document.getElementById('applyUser');
     const welcomeMessage = document.getElementById('welcomeMessage');
 
+    // Set default user to user1 only if not already set
+    if (!localStorage.getItem('currentUser')) {
+        const defaultUser = 'user1';
+        const defaultUserRole = 'user';
+        localStorage.setItem('currentUser', defaultUser);
+        localStorage.setItem('currentUserRole', defaultUserRole);
+        userSelect.value = defaultUser;
+    } else {
+        userSelect.value = localStorage.getItem('currentUser');
+    }
+
     function updateWelcomeMessage() {
         const currentUser = localStorage.getItem('currentUser');
         const currentUserRole = localStorage.getItem('currentUserRole');
