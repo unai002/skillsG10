@@ -1,4 +1,5 @@
-function loadInformation() {
+// Función para cargar el hexágono de la skill que habíamos guardado en localstorage
+function loadSkillHexagon() {
     const skillHexagon = localStorage.getItem('skillHexagon');
     if (skillHexagon) {
         const svgContainer = document.createElement('div');
@@ -6,103 +7,116 @@ function loadInformation() {
         svgContainer.innerHTML = skillHexagon;
         document.querySelector('.hexagon-container').appendChild(svgContainer);
     }
+}
 
-    const infoColumn = document.querySelector('.info-column');
-    const title = document.getElementById('title');
-    const descriptionText = document.getElementById('descriptionText');
-    const skillPoints = document.getElementById('skillPoints');
-    const skillId = localStorage.getItem('skillId'); // Define skillId here
-
+// Función para cargar la información de la skill dada en la página
+function loadSkillInformation(skillId) {
     fetch('electronics/skills.json')
         .then(response => response.json())
         .then(skills => {
             const skillFind = skills.find(item => (item.id).toString() === skillId);
-
             if (skillFind) {
                 let text = (skillFind.text).replace(/\n/g, " ");
-                title.innerText = 'Skill: ' + text;
+                document.getElementById('title').innerText = 'Skill: ' + text;
             } else {
-                console.log("No se encontró el objeto con el ID especificado");
+                console.log("ERROR: no se ha encontrado la información de la competencia a cargar.");
             }
         });
+}
 
+// Para llamar cada vez que se marque o desmarque una tarea (checkbox)
+function checkBoxVerify() {
     const checkboxes = document.querySelectorAll('.checkbox');
+    const allCheck = Array.from(checkboxes).every(checkbox => checkbox.checked);
     const textBoxTittle = document.getElementById('textBoxTitle');
     const textBox = document.getElementById('textBox');
     const buttonSubmit = document.getElementById('buttonSubmit');
-    const backButton = document.getElementById('backButton');
 
-    function checkBoxVerify() {
-        const allCheck = Array.from(checkboxes).every(checkbox => checkbox.checked);
-
-        if (allCheck) {
-            textBoxTittle.style.display = 'block';
-            textBox.style.display = 'block';
-            buttonSubmit.style.display = 'block';
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-        } else {
-            textBoxTittle.style.display = 'none';
-            textBox.style.display = 'none';
-            buttonSubmit.style.display = 'none';
-        }
-
-        // Save the state of checkboxes for the current user
-        const taskStates = Array.from(checkboxes).map(checkbox => checkbox.checked);
-        let localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
-        const currentUser = localStorage.getItem('currentUser');
-
-        if (!localTasksCompleted[skillId]) {
-            localTasksCompleted[skillId] = {};
-        }
-
-        localTasksCompleted[skillId][currentUser] = taskStates;
-        localStorage.setItem('localTasksCompleted', JSON.stringify(localTasksCompleted));
+    // Si todas están marcadas mostramos el formulario + confetti
+    if (allCheck) {
+        textBoxTittle.style.display = 'block';
+        textBox.style.display = 'block';
+        buttonSubmit.style.display = 'block';
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    } else {
+        // Si hay alguna sin marcar lo ocultamos
+        textBoxTittle.style.display = 'none';
+        textBox.style.display = 'none';
+        buttonSubmit.style.display = 'none';
     }
 
-    // Load the state of checkboxes for the current user
-    function loadUserTasks() {
-        const localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
-        const currentUser = localStorage.getItem('currentUser');
-        const savedTaskStates = localTasksCompleted[skillId] ? localTasksCompleted[skillId][currentUser] : null;
+    // Actualizamos el estado de las tareas de el usuario actual en localstorage
+    const skillId = localStorage.getItem('skillId');
+    const taskStates = Array.from(checkboxes).map(checkbox => checkbox.checked);
+    let localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
+    const currentUser = localStorage.getItem('currentUser');
 
-        if (savedTaskStates) {
-            checkboxes.forEach((checkbox, index) => {
-                checkbox.checked = savedTaskStates[index];
-            });
-            checkBoxVerify(); // Update the UI based on loaded state
-        } else {
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            checkBoxVerify(); // Update the UI based on default state
-        }
+    if (!localTasksCompleted[skillId]) {
+        localTasksCompleted[skillId] = {};
     }
 
-    loadUserTasks();
+    localTasksCompleted[skillId][currentUser] = taskStates;
+    localStorage.setItem('localTasksCompleted', JSON.stringify(localTasksCompleted));
+}
 
+// Para cargar la información de las tareas que el usuario actual tiene marcadas
+function loadUserTasks(skillId) {
+    const checkboxes = document.querySelectorAll('.checkbox');
+    const localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
+    const currentUser = localStorage.getItem('currentUser');
+    // Por cada skill, se guarda un array de booleans que indica las tareas que cada usuario ha completado
+    const savedTaskStates = localTasksCompleted[skillId] ? localTasksCompleted[skillId][currentUser] : null;
+
+    if (savedTaskStates) {
+        // Si ya existe, se checkean las tareas dependiendo de sus valores
+        checkboxes.forEach((checkbox, index) => {
+            checkbox.checked = savedTaskStates[index];
+        });
+        checkBoxVerify();
+    } else {
+        // Si no existe, ningún usuario ha checkeado ninguna de las tareas, se inicializan sin marcar
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        checkBoxVerify();
+    }
+
+    // En todas las checkboxes de la página añadimos el listener para llamar a checkBoxVerify cada vez
+    // que alguna checkbox cambie de estado
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', checkBoxVerify);
     });
+}
 
-    // Load the evidence into the input field
+// Para cargar la evidencia que el usuario puede haber enviado ya
+function loadEvidence(skillId) {
     let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
+    const currentUser = localStorage.getItem('currentUser');
     if (evidencias[skillId]) {
-        const currentUser = localStorage.getItem('currentUser');
         const userEvidence = evidencias[skillId].find(evidence => evidence.username === currentUser);
+        // Si el usuario ya había enviado una evidencia para la skill, la cargamos en la caja de texto
         if (userEvidence) {
-            textBox.value = userEvidence.evidence;
+            document.getElementById('textBox').value = userEvidence.evidence;
         }
     }
+}
 
+// Para controlar el envío de evidencias
+function handleEvidenceSubmission() {
+    const buttonSubmit = document.getElementById('buttonSubmit');
+
+    // Listener cuando el usuario quiera enviar una evidencia
     buttonSubmit.addEventListener('click', (e) => {
-        let evidenceText = document.getElementById('textBox').value.trim(); // Get the input text and trim whitespace
+
+        // Comprobación de que la evidencia no esté vacía
+        let evidenceText = document.getElementById('textBox').value.trim();
         if (evidenceText === '') {
-            alert('Evidence text cannot be empty.');
-            return; // Do not submit if the evidence text is empty
+            alert('No puedes enviar una evidencia vacía.');
+            return;
         }
 
         let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
@@ -110,22 +124,23 @@ function loadInformation() {
         const currentUser = localStorage.getItem('currentUser');
 
         if (!evidencias[skillId]) {
+            // Si no existen evidencias para la skill, creamos el array vacío
             evidencias[skillId] = [];
         }
 
-        // Check if the user has already submitted evidence
+        // Entre las evidencias para la skill, buscamos la que el usuario haya enviado (si existe)
         const userEvidenceIndex = evidencias[skillId].findIndex(evidence => evidence.username === currentUser);
 
         if (userEvidenceIndex !== -1) {
-            // Update the existing evidence and reset approval status
+            // Si no existe, creamos un objeto nuevo
             evidencias[skillId][userEvidenceIndex].evidence = evidenceText;
             evidencias[skillId][userEvidenceIndex].approved = false;
             evidencias[skillId][userEvidenceIndex].approvals = [];
         } else {
-            // Add new evidence
+            // Si ya existía, la reemplazamos con la nueva y reseteamos las aprobaciones
             evidencias[skillId].push({
                 username: currentUser,
-                evidence: evidenceText, // Save the actual input text
+                evidence: evidenceText,
                 approved: false,
                 approvals: []
             });
@@ -133,22 +148,33 @@ function loadInformation() {
 
         localStorage.setItem('evidencias', JSON.stringify(evidencias));
     });
+}
 
+// Para controlar el botón de volver
+function handleBackButton() {
+    const backButton = document.getElementById('backButton');
     backButton.addEventListener('click', () => {
         window.location.href = '/';
     });
+}
 
-    // Load and display evidences
+// Para cargar las evidencias enviadas en la tabla de evidencias
+function loadAndDisplayEvidences(skillId) {
     const evidenceTableContainer = document.getElementById('evidenceTableContainer');
     const evidenceTableBody = document.querySelector('#evidenceTable tbody');
-    evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
+    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
     const currentUser = localStorage.getItem('currentUser');
     const currentUserRole = localStorage.getItem('currentUserRole');
 
+    // Si hay alguna evidencia para la skill actual
     if (evidencias[skillId] && evidencias[skillId].length > 0) {
         evidencias[skillId].forEach((evidence, index) => {
             const row = document.createElement('tr');
             const approvalCount = evidence.approvals ? evidence.approvals.length : 0;
+            // Creamos una fila (row, tr) y dentro las columnas necesarias (td)
+            // Construimos el código HTML para las columnas, incluyendo el usuario y la evidencia (el texto)
+            // En la última columna añadimos un botón para aprobar la evidencia si el usuario NO es admin
+            // Si el usuario ES admin, en la última columna añadimos botones para aprobar o rechazar
             row.innerHTML = `
                 <td>${evidence.username}</td>
                 <td>${evidence.evidence}</td>
@@ -168,58 +194,13 @@ function loadInformation() {
             `;
             evidenceTableBody.appendChild(row);
         });
-        evidenceTableContainer.style.display = 'block'; // Show the table if there are evidences
+        evidenceTableContainer.style.display = 'block';
     } else {
-        evidenceTableContainer.style.display = 'none'; // Hide the table if there are no evidences
+        // Si no hay evidencias no mostramos la tabla
+        evidenceTableContainer.style.display = 'none';
     }
 
-    function handleApprove(event) {
-        const skillId = localStorage.getItem('skillId');
-        let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
-        const currentUser = localStorage.getItem('currentUser');
-        const currentUserRole = localStorage.getItem('currentUserRole');
-        const index = event.target.getAttribute('data-index');
-
-        // Prevent user from approving their own evidence
-        if (evidencias[skillId][index].username === currentUser) {
-            alert("You cannot approve your own evidence.");
-            return;
-        }
-
-        if (currentUserRole === 'admin') {
-            // Directly approve the evidence if the user is an admin
-            evidencias[skillId][index].approved = true;
-        } else {
-            if (!evidencias[skillId][index].approvals) {
-                evidencias[skillId][index].approvals = [];
-            }
-
-            if (!evidencias[skillId][index].approvals.includes(currentUser)) {
-                evidencias[skillId][index].approvals.push(currentUser);
-            }
-
-            if (evidencias[skillId][index].approvals.length >= 3) {
-                evidencias[skillId][index].approved = true;
-            }
-        }
-
-        localStorage.setItem('evidencias', JSON.stringify(evidencias));
-        location.reload();
-    }
-
-    function handleReject(event) {
-        const skillId = localStorage.getItem('skillId');
-        evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
-        const index = event.target.getAttribute('data-index');
-
-        // Remove the evidence from the array
-        evidencias[skillId].splice(index, 1);
-
-        localStorage.setItem('evidencias', JSON.stringify(evidencias));
-        location.reload();
-    }
-
-    // Add event listeners for approve and reject buttons
+    // Añadimos event listeners a los botones creados para llamar a las funciones correspondientes
     document.querySelectorAll('.approve-btn').forEach(button => {
         button.addEventListener('click', handleApprove);
     });
@@ -231,20 +212,67 @@ function loadInformation() {
     }
 }
 
+// Para manejar cuando una evidencia es aprobada
+function handleApprove(event) {
+    const skillId = localStorage.getItem('skillId');
+    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
+    const currentUser = localStorage.getItem('currentUser');
+    const currentUserRole = localStorage.getItem('currentUserRole');
+    const index = event.target.getAttribute('data-index');
+
+    if (evidencias[skillId][index].username === currentUser) {
+        alert("No puedes aprobar tu propia evidencia.");
+        return;
+    }
+
+    if (currentUserRole === 'admin') {
+        // Si es admin directamente aprueba la evidencia
+        evidencias[skillId][index].approved = true;
+    } else {
+        // Si no es admin sumamos un aprobado, y solo cuando sean 3 se aprobará la evidencia
+        if (!evidencias[skillId][index].approvals) {
+            evidencias[skillId][index].approvals = [];
+        }
+
+        if (!evidencias[skillId][index].approvals.includes(currentUser)) {
+            evidencias[skillId][index].approvals.push(currentUser);
+        }
+
+        if (evidencias[skillId][index].approvals.length >= 3) {
+            evidencias[skillId][index].approved = true;
+        }
+    }
+
+    localStorage.setItem('evidencias', JSON.stringify(evidencias));
+    location.reload();
+}
+
+// Para controlar cuando una evidencia es rechazada
+function handleReject(event) {
+    const skillId = localStorage.getItem('skillId');
+    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
+    const index = event.target.getAttribute('data-index');
+
+    // La eliminamos directamente
+    evidencias[skillId].splice(index, 1);
+
+    localStorage.setItem('evidencias', JSON.stringify(evidencias));
+    location.reload();
+}
+
+// Función principal, carga la información llamando a las funciones anteriores
+function loadInformation() {
+    const skillId = localStorage.getItem('skillId');
+    loadSkillHexagon();
+    loadSkillInformation(skillId);
+    loadUserTasks(skillId);
+    loadEvidence(skillId);
+    handleEvidenceSubmission();
+    handleBackButton();
+    loadAndDisplayEvidences(skillId);
+}
+
 window.onload = () => {
     loadInformation();
 };
 
-const applyUserButton = document.getElementById('applyUser');
-if (applyUserButton) {
-    applyUserButton.addEventListener('click', () => {
-        const selectedUser = document.getElementById('userSelect').value;
-        const userRole = document.getElementById('userSelect').selectedOptions[0].getAttribute('data-role');
-
-        localStorage.setItem('currentUser', selectedUser);
-        localStorage.setItem('currentUserRole', userRole);
-
-        alert(`User changed to ${selectedUser} with role ${userRole}`);
-        loadInformation(); // Reload information for the new user
-    });
-}

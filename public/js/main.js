@@ -1,24 +1,31 @@
 // CONSTRUCCIÓN DE LOS HEXÁGONOS
+
+// Obtenemos la información de los skills
 fetch('electronics/skills.json')
     .then(response => response.json())
     .then(skills => {
         const svgContainer = document.querySelector('.svg-container');
         skills.forEach(skill => {
+
+            // Contenedor
             const svgWrapper = document.createElement('div');
             svgWrapper.classList.add('svg-wrapper');
             svgWrapper.setAttribute('data-id', skill.id);
             svgWrapper.setAttribute('data-custom', 'false');
 
+            // SVG
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('width', '100');
             svg.setAttribute('height', '100');
             svg.setAttribute('viewBox', '0 0 100 100');
 
+            // Hexágono
             const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
             polygon.setAttribute('points', '50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5');
             polygon.classList.add('hexagon');
-            svg.appendChild(polygon);
+            svg.appendChild(polygon); // Lo metemos dentro del SVG
 
+            // Objeto texto
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', '50%');
             text.setAttribute('y', '20%');
@@ -26,6 +33,7 @@ fetch('electronics/skills.json')
             text.setAttribute('fill', 'black');
             text.setAttribute('font-size', '9.5');
 
+            // Extraemos las líneas del texto y creamos objetos tspan
             const lines = skill.text.split('\n');
             let dy = 1.2;
             lines.forEach((line, index) => {
@@ -34,20 +42,21 @@ fetch('electronics/skills.json')
                 tspan.setAttribute('dy', `${dy}em`);
                 tspan.setAttribute('font-weight', 'bold');
                 tspan.textContent = line;
-                text.appendChild(tspan);
+                text.appendChild(tspan); // Metemos los tspan dentro del texto
             });
 
-            svg.appendChild(text);
+            svg.appendChild(text); // Metemos el texto dentro del SVG
 
+            // Icono
             const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
             image.setAttribute('x', '35%');
             image.setAttribute('y', '60%');
             image.setAttribute('width', '30');
             image.setAttribute('height', '30');
             image.setAttribute('href', `../electronics/icons/${skill.icon}`);
-            svg.appendChild(image);
+            svg.appendChild(image); // Metemos el icono en el SVG
 
-            svgWrapper.appendChild(svg);
+            svgWrapper.appendChild(svg); // Metemos el SVG en el contenedor
             svgContainer.appendChild(svgWrapper);
         });
     })
@@ -58,6 +67,8 @@ fetch('electronics/skills.json')
 // FUNCIONES
 
 function eventManager() {
+
+    // Para que aparezca la descripción al pasar el ratón por los skills
     document.querySelectorAll('.svg-wrapper').forEach(wrapper => {
         wrapper.addEventListener('mouseover', () => {
             let banner = document.querySelector('.description-banner');
@@ -69,6 +80,7 @@ function eventManager() {
         });
     });
 
+    // Manejar el click en el icono del cuaderno de cada skill
     document.querySelectorAll('.svg-wrapper').forEach(wrapper => {
         const cuaderno = wrapper.querySelector('.emojiCuaderno');
         if (cuaderno) {
@@ -82,6 +94,7 @@ function eventManager() {
     });
 }
 
+// Para guardar el hexágono en localstorage y poder pasarlo entre páginas
 function storeSkillHexagon(wrapper) {
     const svgElement = wrapper.querySelector('svg');
     if (svgElement) {
@@ -89,30 +102,31 @@ function storeSkillHexagon(wrapper) {
     }
 }
 
+// Para colorear en verde una skill y cambiar el punto rojo por otro verde (cuando esté aprobada)
 function approveEvidence(skillId) {
-    console.log("esta llamando a approveskill")
     const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skillId}"]`);
     const hex = svgWrapper.getElementsByClassName('hexagon')[0];
     if (hex) {
         hex.style.fill = '#2afa2a';
-        console.log("hexagono en verde")
     }
     const redDot = svgWrapper.getElementsByClassName('redNotification')[0];
     const greenDot = svgWrapper.getElementsByClassName('greenNotification')[0];
 
+    // Utilizamos la propiedad de estilo "display" para hacer los elementos aparecer y desaparecer
     if (redDot) {
-        redDot.style.display = 'none';
+        redDot.style.display = 'none'; // No aparece
     }
 
     if (greenDot) {
-        greenDot.style.display = 'flex';
+        greenDot.style.display = 'flex'; // Se posiciona en la pantalla
     }
 }
 
-
-function loadRedDots() {
+// Para crear los puntos de notificaciones en los hexágonos de skills
+function loadNotificationDots() {
+    // Obtenemos el array donde se guarda la información de las evidencias y el usuario
     let evidencias = localStorage.getItem('evidencias');
-    const currentUser = localStorage.getItem('currentUser'); // Retrieve currentUser from localStorage
+    const currentUser = localStorage.getItem('currentUser');
 
     try {
         evidencias = JSON.parse(evidencias) || {};
@@ -122,8 +136,11 @@ function loadRedDots() {
     }
 
     for (let skillId in evidencias) {
+        // Por cada skill contamos las evidencias
         const evidenceList = evidencias[skillId];
         const evidenceCount = evidenceList.length;
+
+        // Si hay alguna evidencia, se crean los círculos de notificación
         if (evidenceCount > 0) {
             const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skillId}"]`);
             if (svgWrapper) {
@@ -136,7 +153,8 @@ function loadRedDots() {
                 svgWrapper.appendChild(redDot);
                 svgWrapper.appendChild(greenDot);
 
-                // Check if the evidence for the current user is approved and call approveEvidence
+                // Si hay alguna evidencia que el usuario actual ha publicado y está aprobada,
+                // llamamos a la función approveEvidence que coloreará el hexágono en verde
                 const userEvidence = evidenceList.find(evidence => evidence.username === currentUser);
                 if (userEvidence && userEvidence.approved) {
                     approveEvidence(skillId);
@@ -146,6 +164,7 @@ function loadRedDots() {
     }
 }
 
+// Para crear la barra donde se visualiza la descripción de la skill
 function createLowerBanner() {
     const descriptionBanner = document.createElement('div');
     descriptionBanner.id = 'description-banner';
@@ -153,6 +172,7 @@ function createLowerBanner() {
     document.body.appendChild(descriptionBanner);
 }
 
+// Para insertar un emoji dentro de todos los hexágonos
 function appendEmoji(svgContent, className) {
     const containers = document.querySelectorAll('.svg-wrapper');
     containers.forEach((cont) => {
@@ -165,7 +185,10 @@ function appendEmoji(svgContent, className) {
     });
 }
 
+// INICIALIZACIÓN DE LA PÁGINA
+
 window.onload = function() {
+    // Promesa para el icono del lápiz
     const fetchPencil = fetch('https://www.reshot.com/preview-assets/icons/U3A6CNXBDH/pencil-U3A6CNXBDH.svg')
         .then(response => {
             if (!response.ok) {
@@ -174,6 +197,7 @@ window.onload = function() {
             return response.text();
         });
 
+    // Promesa para el icono del cuaderno
     const fetchNotebook = fetch('https://www.reshot.com/preview-assets/icons/UVG3NADPR2/note-book-UVG3NADPR2.svg')
         .then(response => {
             if (!response.ok) {
@@ -184,14 +208,14 @@ window.onload = function() {
 
     Promise.all([fetchPencil, fetchNotebook])
         .then(([pencilSvg, notebookSvg]) => {
-            appendEmoji(pencilSvg, 'emojiLapiz');
-            appendEmoji(notebookSvg, 'emojiCuaderno');
-            eventManager();
+            appendEmoji(pencilSvg, 'emojiLapiz'); // Insertamos el lápiz en todos los hexágonos
+            appendEmoji(notebookSvg, 'emojiCuaderno'); // Insertamos el cuaderno en todos los hexágonos
+            eventManager(); // Después llamamos a eventManager, para garantizar que el cuaderno está cargado
         })
         .catch(error => {
-            console.error('Error loading the SVGs:', error);
+            console.error('Error al cargar los iconos de edición e información.', error);
         });
 
     createLowerBanner();
-    loadRedDots();
+    loadNotificationDots(); // Se llama ahora, una vez los hexágonos están creados, fuera del window.onload
 };

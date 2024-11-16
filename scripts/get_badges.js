@@ -73,7 +73,7 @@ async function extractTablesInRange(startIndex, endIndex) {
         await downloadAllBadges(allTablesData);
 
     } catch (error) {
-        console.error('Error extracting tables data:', error);
+        console.error('Error al extraer los valores de la tabla:', error);
     }
 }
 

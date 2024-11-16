@@ -1,8 +1,11 @@
+/* GENERAL */
+
 body {
   font-family: Arial, sans-serif;
   padding: 20px;
   padding-bottom: 70px;
   background-color: #f0f0f0;
+  font-size: 14;
 }
 
 h1 {
@@ -42,97 +45,7 @@ h6 {
   display: none;
 }
 
-#textBox {
-  display: none;
-  margin-top: 10px;
-  width: 80%;
-  height: 50px;
-  font-size: 14px;
-  padding: 8px;
-  box-sizing: content-box;
-}
-
-.backButton {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1em;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.backButton:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-
-.backButton:active {
-  background-color: #004494;
-  transform: scale(1);
-}
-
-.redNotification {
-  width: 20px;
-  height: 20px;
-  background-color: red;
-  filter: drop-shadow(0 0 4px rgb(255, 0, 0)); /* Custom-shaped shadow */
-  border-radius: 50%;
-  position: absolute;
-  top: 5%;
-  left: 22%; /* Adjusted to move it more to the left */
-  transform: translateX(-50%);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-}
-
-.greenNotification {
-  width: 20px;
-  height: 20px;
-  background-color: #31cd31;
-  filter: drop-shadow(0 0 4px rgb(49, 205, 49)); /* Custom-shaped shadow */
-  border-radius: 50%;
-  position: absolute;
-  top: 5%;
-  left: 78%; /* Adjusted to move it more to the left */
-  transform: translateX(-50%);
-  color: white;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-}
-
-.buttonSubmit {
-  background-color: #31cd31; /* Green background color */
-  color: white; /* White text color */
-  border: none; /* No border */
-  margin-top: 10px;
-  width: 20%; /* Button width */
-  height: 35px; /* Button height */
-  border-radius: 5px;
-  font-size: 15px; /* Text size */
-  cursor: pointer; /* Pointer cursor on hover */
-  display: none;
-  justify-content: center;
-  align-items: center;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Transition for background color and transform */
-  margin-left: 30%;
-}
-
-.buttonSubmit:hover {
-  background-color: #0e680e; /* Darker green on hover */
-  transform: scale(1.05); /* Slightly increase size on hover */
-}
-
-.buttonSubmit:active {
-  background-color: #0b4d0b; /* Even darker green on click */
-  transform: scale(1); /* Reset size on click */
-}
+/* PÁGINA PRINCIPAL */
 
 .skill-tree {
   text-align: center;
@@ -147,21 +60,74 @@ h6 {
   border-radius: 5px;
 }
 
-.description {
-  text-align: center;
-  font-size: 1em;
-  margin: 20px 0;
-  line-height: 1.5;
+.redNotification {
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  filter: drop-shadow(0 0 4px rgb(255, 0, 0));
+  border-radius: 50%;
+  position: absolute;
+  top: 5%;
+  left: 22%;
+  transform: translateX(-50%);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
 }
 
-.color-picker {
-  text-align: center;
-  margin-bottom: 20px;
+.greenNotification {
+  width: 20px;
+  height: 20px;
+  background-color: #31cd31;
+  filter: drop-shadow(0 0 4px rgb(49, 205, 49));
+  border-radius: 50%;
+  position: absolute;
+  top: 5%;
+  left: 78%;
+  transform: translateX(-50%);
+  color: white;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
 }
 
-.color-picker .start-here {
-  font-weight: bold;
-  margin-top: 10px;
+.user-panel {
+  margin: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.user-panel label {
+  margin-right: 10px;
+}
+
+.user-panel select {
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.user-panel button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.user-panel button:hover {
+  background-color: #0056b3;
+}
+
+#welcomeMessage {
+  margin-left: 10px;
 }
 
 .custom-svg {
@@ -222,17 +188,17 @@ h6 {
   stroke: black;
   stroke-width: 1px;
 }
+
 .selected .hexagon {
   fill: var(--selected-color, yellow);
 }
-
 
 .emojiContainer {
   display: none;
   position: absolute;
   transform: translate(-50%, -50%);
   font-size: 10px;
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5)); /* Custom-shaped shadow */
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.5));
 }
 
 .emojiLapiz {
@@ -250,18 +216,6 @@ h6 {
   left: 20%;
 }
 
-@media print {
-  .color-picker {
-    display: none;
-  }
-  .custom-svg{
-    display: none;
-  }
-  .print-button{
-    display: none;
-  }
-}
-
 .description-banner {
   position: fixed;
   left: 0;
@@ -271,18 +225,85 @@ h6 {
   background-color: rgb(234, 225, 107);
   color: black;
   text-align: center;
-  padding: 1.5%; /* Adjust percentage as needed */
+  padding: 1.5%;
   font-size: 1em;
-  display: none; /* Initially hidden */
+  display: none;
+}
+
+/* PÁGINA DE INFORMACIÓN DE LA SKILL */
+
+#textBox {
+  display: none;
+  margin-top: 10px;
+  width: 80%;
+  height: 50px;
+  font-size: 14px;
+  padding: 8px;
+  box-sizing: content-box;
+}
+
+.backButton {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.backButton:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.backButton:active {
+  background-color: #004494;
+  transform: scale(1);
+}
+
+.buttonSubmit {
+  background-color: #31cd31;
+  color: white;
+  border: none;
+  margin-top: 10px;
+  width: 20%;
+  height: 35px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-left: 30%;
+}
+
+.buttonSubmit:hover {
+  background-color: #0e680e;
+  transform: scale(1.05);
+}
+
+.buttonSubmit:active {
+  background-color: #0b4d0b;
+  transform: scale(1);
+}
+
+.description {
+  text-align: center;
+  font-size: 1em;
+  margin: 20px 0;
+  line-height: 1.5;
 }
 
 .page-simulation {
-  width: 60%; /* Adjust width as needed */
-  aspect-ratio: 3 / 4; /* Maintain a vertical rectangle aspect ratio */
-  margin: 0 auto; /* Center horizontally */
-  background-color: white; /* Background color of the simulated page */
-  border: 1px solid #ccc; /* Border to simulate the page */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for a 3D effect */
+  width: 60%;
+  aspect-ratio: 3 / 4;
+  margin: 0 auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -295,25 +316,24 @@ h6 {
 }
 
 .hexagon-column {
-  width: 20%; /* Adjust width as needed */
+  width: 20%;
   vertical-align: top;
 }
 
 .hexagon-container {
-  margin-top: 20%; /* Adjust margin as needed */
+  margin-top: 20%;
 }
 
 .info-header {
-  margin-top: 10%; /* Adjust margin as needed */
+  margin-top: 10%;
 }
 
 .info-column {
-  width: 80%; /* Adjust width as needed */
+  width: 80%;
   vertical-align: top;
-  padding-left: 20px; /* Add some padding for better readability */
+  padding-left: 20px;
 }
 
-/* Estilos para mejorar la presentación de la lista */
 .checkbox-list {
   list-style-type: none;
   padding: 0;
@@ -329,47 +349,6 @@ h6 {
   margin-right: 8px;
 }
 
-.user-panel {
-  margin: 20px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-}
-
-.user-panel label {
-  margin-right: 10px;
-}
-
-.user-panel select {
-  margin-right: 10px;
-  padding: 5px;
-}
-
-.user-panel button {
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.user-panel button:hover {
-  background-color: #0056b3;
-}
-
-#welcomeMessage {
-  margin-left: 10px; /* Add margin to separate the message from the button */
-}
-
-/* Make all text smaller */
-body {
-  font-size: 14px;
-}
-
 .skill-details h2,
 .skill-details h3,
 .skill-details h6,
@@ -380,7 +359,6 @@ body {
   font-size: 14px;
 }
 
-/* Style the evidence table */
 #evidenceTable {
   width: 100%;
   border-collapse: collapse;
@@ -424,13 +402,77 @@ body {
   opacity: 0.8;
 }
 
-/* Footer styles */
+/* PÁGINA DE LEADERBOARD */
+
+/* Leaderboard Page */
+.leaderboard-title {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.leaderboard-table {
+  width: 80%;
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.leaderboard-table th {
+  background-color: #f2f2f2;
+}
+
+.leaderboard-rango {
+  width: 50%;
+}
+
+.leaderboard-badge {
+  width: 25%;
+}
+
+.leaderboard-bitpoints {
+  width: 25%;
+}
+
+.leaderboard-table img {
+  max-width: 50px;
+  height: auto;
+}
+
+/* OTROS */
+
+@media print {
+  .color-picker {
+    display: none;
+  }
+  .custom-svg{
+    display: none;
+  }
+  .print-button{
+    display: none;
+  }
+}
+
+.color-picker {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.color-picker .start-here {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
 footer {
 
-  bottom: 0; /* Stick to the bottom of the viewport */
+  bottom: 0;
   width: 100%;
 
   text-align: center;
-  background-color: #f0f0f0; /* Light background color */
-  border-top: 1px solid #ccc; /* Border on top */
+  background-color: #f0f0f0;
+  border-top: 1px solid #ccc;
 }
