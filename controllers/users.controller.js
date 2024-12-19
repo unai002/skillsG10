@@ -72,3 +72,33 @@ exports.login = async (req, res) => {
         message: 'Credenciales incorrectas',
     });
 };
+
+exports.logout = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error al cerrar la sesión:', err);
+            return res.status(500).json({
+                status: 'error',
+                message: 'Error al cerrar la sesión'
+            });
+        }
+        res.status(200).json({
+            status: 'success',
+            message: 'Sesión cerrada correctamente'
+        });
+    });
+};
+
+exports.info = async (req, res) => {
+    if (req.session.username) {
+        res.json({
+            username: req.session.username,
+            admin: req.session.admin
+        });
+    } else {
+        res.status(401).json({
+            status: 'error',
+            message: 'Usuario no autenticado'
+        });
+    }
+};

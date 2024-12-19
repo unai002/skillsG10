@@ -95,35 +95,25 @@ h6 {
 }
 
 .user-panel {
-  margin: 20px;
+  background-color: #fdf5c4; /* Color de fondo amarillo */
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
+  border-radius: 5px; /* Bordes redondeados */
+  font-family: Arial, sans-serif;
+  font-size: 14px;
 }
 
-.user-panel label {
-  margin-right: 10px;
+.user-panel a {
+  color: #007bff; /* Azul para los enlaces */
+  text-decoration: none;
+  margin: 0 5px;
 }
 
-.user-panel select {
-  margin-right: 10px;
-  padding: 5px;
+.user-panel a:hover {
+  text-decoration: underline;
 }
 
-.user-panel button {
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.user-panel button:hover {
-  background-color: #0056b3;
+.user-panel span {
+  margin-right: 5px;
 }
 
 #welcomeMessage {

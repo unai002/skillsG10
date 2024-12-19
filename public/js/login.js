@@ -28,11 +28,8 @@ window.onload = function () {
                 messageDiv.textContent = 'Inicio de sesión exitoso';
                 messageDiv.style.color = 'green';
 
-                // Guardar el token JWT en localStorage
-                localStorage.setItem('authToken', data.token);
-
                 // Redirigir a la página principal
-                window.location.href = '/main.html'; // Asegúrate de que la ruta sea correcta
+                window.location.href = '/skills/'; // Asegúrate de que la ruta sea correcta
             } else {
                 // Si la respuesta no es exitosa, mostrar mensaje de error
                 messageDiv.textContent = data.message || 'Error al iniciar sesión.';

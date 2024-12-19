@@ -1,7 +1,7 @@
 // CONSTRUCCIÓN DE LOS HEXÁGONOS
 
 // Obtenemos la información de los skills
-fetch('electronics/skills.json')
+fetch('/electronics/skills.json')
     .then(response => response.json())
     .then(skills => {
         const svgContainer = document.querySelector('.svg-container');
@@ -53,7 +53,7 @@ fetch('electronics/skills.json')
             image.setAttribute('y', '60%');
             image.setAttribute('width', '30');
             image.setAttribute('height', '30');
-            image.setAttribute('href', `../electronics/icons/${skill.icon}`);
+            image.setAttribute('href', `/electronics/icons/${skill.icon}`);
             svg.appendChild(image); // Metemos el icono en el SVG
 
             svgWrapper.appendChild(svg); // Metemos el SVG en el contenedor
@@ -88,7 +88,7 @@ function eventManager() {
                 const skillId = wrapper.getAttribute('data-id');
                 localStorage.setItem('skillId', skillId);
                 storeSkillHexagon(wrapper);
-                window.location.href = 'skillspecifics.html';
+                window.location.href = `/skills/electronics/view/${skillId}`;
             });
         }
     });
@@ -187,12 +187,42 @@ function appendEmoji(svgContent, className) {
 
 // INICIALIZACIÓN DE LA PÁGINA
 
-window.onload = async function() {
-    // Obtener el rol del usuario logeado
-    const userInfo = await getUserInfo();
-    const currentUserRole = userInfo ? userInfo.admin ? 'admin' : 'user' : null;
+window.onload = async function () {
+    // Retrieve user info from localStorage
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
-    // Promesa para el icono del cuaderno
+    // If userInfo is not in localStorage, fetch it from the server
+    userInfo = await getUserInfo();
+    localStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+    const currentUserRole = userInfo ? userInfo.admin ? 'admin' : 'user' : null;
+    const currentUserName = userInfo ? userInfo.username : 'Guest';
+    console.log("currentUserName", currentUserName);
+    // Display welcome message
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    welcomeMessage.innerHTML = `Welcome, <strong>${currentUserName}</strong>!`;
+
+    // Handle logout button
+    const logoutButton = document.getElementById("logoutButton");
+    logoutButton.addEventListener('click', async () => {
+        const response = await fetch('/users/logout', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            localStorage.removeItem('userInfo'); // Clear user info from localStorage
+            window.location.href = '/'; // Redirect to the homepage
+        } else {
+            console.error('Error al cerrar la sesión:', result.message);
+        }
+    });
+
+    // Fetch and append emojis
     const fetchNotebook = fetch('https://www.reshot.com/preview-assets/icons/UVG3NADPR2/note-book-UVG3NADPR2.svg')
         .then(response => {
             if (!response.ok) {
@@ -201,7 +231,6 @@ window.onload = async function() {
             return response.text();
         });
 
-    // Promesa para el icono del lápiz (solo si el usuario es admin)
     let fetchPencil = Promise.resolve(null);
     if (currentUserRole === 'admin') {
         fetchPencil = fetch('https://www.reshot.com/preview-assets/icons/U3A6CNXBDH/pencil-U3A6CNXBDH.svg')
@@ -216,27 +245,27 @@ window.onload = async function() {
     Promise.all([fetchPencil, fetchNotebook])
         .then(([pencilSvg, notebookSvg]) => {
             if (pencilSvg) {
-                appendEmoji(pencilSvg, 'emojiLapiz'); // Insertamos el lápiz en todos los hexágonos
+                appendEmoji(pencilSvg, 'emojiLapiz');
             }
-            appendEmoji(notebookSvg, 'emojiCuaderno'); // Insertamos el cuaderno en todos los hexágonos
-            eventManager(); // Después llamamos a eventManager, para garantizar que el cuaderno está cargado
+            appendEmoji(notebookSvg, 'emojiCuaderno');
+            eventManager();
         })
         .catch(error => {
-            console.error('Error al cargar los iconos de edición e información.', error);
+            console.error('Error loading icons:', error);
         });
 
     createLowerBanner();
-    loadNotificationDots(); // Se llama ahora, una vez los hexágonos están creados, fuera del window.onload
+    loadNotificationDots();
 };
 
 async function getUserInfo() {
     try {
-        const response = await fetch('http://localhost:3000/users/info', {
+        const response = await fetch('/users/info', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include' // Include cookies in the request
+            credentials: 'include'
         });
 
         if (!response.ok) {

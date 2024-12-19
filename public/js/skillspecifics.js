@@ -11,7 +11,7 @@ function loadSkillHexagon() {
 
 // Función para cargar la información de la skill dada en la página
 function loadSkillInformation(skillId) {
-    fetch('electronics/skills.json')
+    fetch('/electronics/skills.json')
         .then(response => response.json())
         .then(skills => {
             const skillFind = skills.find(item => (item.id).toString() === skillId);
@@ -154,7 +154,7 @@ function handleEvidenceSubmission() {
 function handleBackButton() {
     const backButton = document.getElementById('backButton');
     backButton.addEventListener('click', () => {
-        window.location.href = '/';
+        window.location.href = '/skills/electronics';
     });
 }
 
