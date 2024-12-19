@@ -3,6 +3,7 @@ window.onload = function() {
     document.getElementById('registerButton').addEventListener('click', async function () {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
         const messageDiv = document.getElementById('message');
         messageDiv.textContent = '';
@@ -10,6 +11,13 @@ window.onload = function() {
         // Validar que ambos campos estén llenos
         if (!username || !password) {
             messageDiv.textContent = 'Por favor, completa todos los campos.';
+            messageDiv.style.color = 'red';
+            return;
+        }
+
+        // Validar que las contraseñas coincidan
+        if (password !== confirmPassword) {
+            messageDiv.textContent = 'Las contraseñas no coinciden.';
             messageDiv.style.color = 'red';
             return;
         }

@@ -187,15 +187,10 @@ function appendEmoji(svgContent, className) {
 
 // INICIALIZACIÓN DE LA PÁGINA
 
-window.onload = function() {
-    // Promesa para el icono del lápiz
-    const fetchPencil = fetch('https://www.reshot.com/preview-assets/icons/U3A6CNXBDH/pencil-U3A6CNXBDH.svg')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.text();
-        });
+window.onload = async function() {
+    // Obtener el rol del usuario logeado
+    const userInfo = await getUserInfo();
+    const currentUserRole = userInfo ? userInfo.admin ? 'admin' : 'user' : null;
 
     // Promesa para el icono del cuaderno
     const fetchNotebook = fetch('https://www.reshot.com/preview-assets/icons/UVG3NADPR2/note-book-UVG3NADPR2.svg')
@@ -206,9 +201,23 @@ window.onload = function() {
             return response.text();
         });
 
+    // Promesa para el icono del lápiz (solo si el usuario es admin)
+    let fetchPencil = Promise.resolve(null);
+    if (currentUserRole === 'admin') {
+        fetchPencil = fetch('https://www.reshot.com/preview-assets/icons/U3A6CNXBDH/pencil-U3A6CNXBDH.svg')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            });
+    }
+
     Promise.all([fetchPencil, fetchNotebook])
         .then(([pencilSvg, notebookSvg]) => {
-            appendEmoji(pencilSvg, 'emojiLapiz'); // Insertamos el lápiz en todos los hexágonos
+            if (pencilSvg) {
+                appendEmoji(pencilSvg, 'emojiLapiz'); // Insertamos el lápiz en todos los hexágonos
+            }
             appendEmoji(notebookSvg, 'emojiCuaderno'); // Insertamos el cuaderno en todos los hexágonos
             eventManager(); // Después llamamos a eventManager, para garantizar que el cuaderno está cargado
         })
@@ -219,3 +228,25 @@ window.onload = function() {
     createLowerBanner();
     loadNotificationDots(); // Se llama ahora, una vez los hexágonos están creados, fuera del window.onload
 };
+
+async function getUserInfo() {
+    try {
+        const response = await fetch('http://localhost:3000/users/info', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include' // Include cookies in the request
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user information');
+        }
+
+        const userInfo = await response.json();
+        return userInfo;
+    } catch (error) {
+        console.error('Error fetching user information:', error);
+        return null;
+    }
+}
