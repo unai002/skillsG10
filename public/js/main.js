@@ -224,6 +224,14 @@ window.onload = async function () {
         }
     });
 
+    const createButton = document.getElementById('createButton');
+    createButton.addEventListener('click', () => {
+        const skillTreeName = 'electronics'; // El nombre del árbol de habilidades
+
+        // Redirige al formulario para añadir una nueva habilidad
+        window.location.href = `/skills/${skillTreeName}/add`; // Redirige a la página de creación
+    });
+
     // Fetch and append emojis
     const fetchNotebook = fetch('https://www.reshot.com/preview-assets/icons/UVG3NADPR2/note-book-UVG3NADPR2.svg')
         .then(response => {
@@ -281,3 +289,4 @@ async function getUserInfo() {
         return null;
     }
 }
+
