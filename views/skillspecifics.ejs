@@ -10,16 +10,17 @@
     <script type="module" src="/js/skillspecifics.js" defer></script>
 </head>
 <body>
+<%- include('partials/userpanel') %>
 <div class="skill-details">
-    <button id="backButton" class="backButton">Volver</button>
-    <div class="page-simulation">
+    <div class="edit-skill-page">
+        <button id="backButton" class="backButton">Volver</button>
         <table class="skill-table">
             <tr>
                 <td class="hexagon-column">
                     <div class="hexagon-container"></div>
                 </td>
                 <td class="info-column">
-                    <h2 id="title" class="info-header"></h2>
+                    <h1 id="title" class="info-header" style="text-align: left;"></h1>
                     <h3 id="skillScore">Skill score: 1 point</h3>
                     <h3 id="description"> Description </h3>
                     <p id="descriptionText" class="descriptionText"> Description of the skill not developed yet </p>

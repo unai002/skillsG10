@@ -31,7 +31,8 @@ exports.register = async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        mockUsers[username] = { password: hashedPassword, admin: false }; // Set admin to false
+        const isFirstUser = Object.keys(mockUsers).length === 0;
+        mockUsers[username] = { password: hashedPassword, admin: isFirstUser };
 
         return res.status(201).json({
             status: 'success',
@@ -77,15 +78,17 @@ exports.logout = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Error al cerrar la sesión:', err);
-            return res.status(500).json({
-                status: 'error',
-                message: 'Error al cerrar la sesión'
-            });
+            if (!res.headersSent) {
+                return res.status(500).json({
+                    status: 'error',
+                    message: 'Error al cerrar la sesión'
+                });
+            }
+        } else {
+            if (!res.headersSent) {
+                res.redirect('/'); // Redirige al usuario a la página de inicio
+            }
         }
-        res.status(200).json({
-            status: 'success',
-            message: 'Sesión cerrada correctamente'
-        });
     });
 };
 

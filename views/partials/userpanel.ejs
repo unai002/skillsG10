@@ -1,0 +1,10 @@
+<div class="user-panel">
+    <span id="welcomeMessage">Welcome, <strong><%= username %></strong>!</span> |
+    <span>Skill Trees: <a href="/skills/electronics">electronics</a></span> |
+    <a href="#leaderboard">Leaderboard</a> |
+    <a href="#about">About</a> |
+    <% if (admin) { %>
+        <a href="#dashboard">Admin Dashboard</a> |
+    <% } %>
+    <a href="/users/logout" id="logoutButton">Logout</a>
+</div>

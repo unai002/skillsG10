@@ -91,6 +91,15 @@ function eventManager() {
                 window.location.href = `/skills/electronics/view/${skillId}`;
             });
         }
+
+        // Manejar el click en el icono del lápiz de cada skill (solo para admins)
+        const lapiz = wrapper.querySelector('.emojiLapiz');
+        if (lapiz) {
+            lapiz.addEventListener('click', (event) => {
+                const skillId = wrapper.getAttribute('data-id');
+                window.location.href = `/skills/electronics/edit/${skillId}`;
+            });
+        }
     });
 }
 
@@ -198,27 +207,20 @@ window.onload = async function () {
     const currentUserRole = userInfo ? userInfo.admin ? 'admin' : 'user' : null;
     const currentUserName = userInfo ? userInfo.username : 'Guest';
     console.log("currentUserName", currentUserName);
-    // Display welcome message
-    const welcomeMessage = document.getElementById('welcomeMessage');
-    welcomeMessage.innerHTML = `Welcome, <strong>${currentUserName}</strong>!`;
 
     // Handle logout button
     const logoutButton = document.getElementById("logoutButton");
     logoutButton.addEventListener('click', async () => {
-        const response = await fetch('/users/logout', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        });
-
-        const result = await response.json();
-        if (result.status === 'success') {
-            localStorage.removeItem('userInfo'); // Clear user info from localStorage
-            window.location.href = '/'; // Redirect to the homepage
-        } else {
-            console.error('Error al cerrar la sesión:', result.message);
+        try {
+            await fetch('/users/logout', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+        } catch (error) {
+            console.error('Error during logout:', error);
         }
     });
 
