@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="module" src="/js/backbutton.js" defer></script>
+</head>
+<body>
+<%- include('partials/username-display', { admin: isAdmin }) %>
+<div class="edit-skill-page">
+    <button id="backButton" class="backButton">Volver</button>
+    <header>
+        <h1>Admin dashboard</h1>
+    </header>
+    <section class="admin-form">
+        <div class="option">
+            <a href="#TO-DO-editarmedallas" class="admin-button">Editar Medallas</a>
+        </div>
+        <div class="option">
+            <a href="#TO-DO-editarusuarios" class="admin-button">Editar Usuarios</a>
+        </div>
+    </section>
+</div>
+</body>
+</html>

@@ -10,6 +10,7 @@ const upload = multer();
 const indexRouter = require('./routes/index.routes');
 const usersRouter = require('./routes/users.routes');
 const skillsRouter = require('./routes/skills.routes');
+const adminRouter = require('./routes/admin.routes');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use(upload.array());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/skills', skillsRouter);
+app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
