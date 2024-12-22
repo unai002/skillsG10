@@ -4,17 +4,29 @@ const express = require('express');
 const router = express.Router();
 const skillsController = require('../controllers/skills.controller');
 
-router.get('/', (req, res) => {
-    if (!req.session.username) {
-        res.redirect('/');
+// Middleware para verificar si el usuario ha iniciado sesión
+function isLoggedIn(req, res, next) {
+    if (req.session && req.session.username) {
+        next(); // El usuario está logueado, continuar con la siguiente función
+    } else {
+        res.redirect('/'); // El usuario no está logueado, redirigir a la página de inicio de sesión
     }
+}
+
+// Middleware para verificar si el usuario es administrador
+function isAdmin(req, res, next) {
+    if (req.session && req.session.admin) {
+        next(); // Si es administrador, continuar
+    } else {
+        res.redirect('/skills/electronics');
+    }
+}
+
+router.get('/', isLoggedIn, (req, res) => {
     res.redirect('/skills/electronics');
 });
 
-router.get('/:skillTreeName', (req, res) => {
-    if (!req.session.username) {
-        res.redirect('/');
-    }
+router.get('/:skillTreeName', isLoggedIn, (req, res) => {
     res.render('main', {
         skillTreeName: req.params.skillTreeName,
         username: req.session.username,
@@ -22,10 +34,7 @@ router.get('/:skillTreeName', (req, res) => {
     });
 });
 
-router.get('/:skillTreeName/view/:skillID', (req, res) => {
-    if (!req.session.username) {
-        res.redirect('/');
-    }
+router.get('/:skillTreeName/view/:skillID', isLoggedIn, (req, res) => {
     res.render('skillspecifics', {
         skillTreeName: req.params.skillTreeName,
         skillID: req.params.skillID,
@@ -34,14 +43,7 @@ router.get('/:skillTreeName/view/:skillID', (req, res) => {
     });
 });
 
-router.get('/:skillTreeName/edit/:skillID', (req, res) => {
-    if (!req.session.username) {
-        res.redirect('/');
-    }
-    if (!req.session.admin) {
-        res.redirect('/skills/' + req.params.skillTreeName);
-    }
-
+router.get('/:skillTreeName/edit/:skillID', isAdmin,(req, res) => {
     // Obtener los datos de la skill desde la base de datos o cualquier fuente de datos
     const skillData = {
         skillText: 'test pa ver si funciona',
@@ -61,15 +63,6 @@ router.get('/:skillTreeName/edit/:skillID', (req, res) => {
 
 });
 
-// Middleware para verificar si el usuario es administrador
-function isAdmin(req, res, next) {
-    if (req.session && req.session.admin) {
-        next(); // Si es administrador, continuar
-    } else {
-        res.status(403).send('Acceso denegado: Se requiere rol de administrador');
-    }
-}
-
 router.get('/:skillTreeName/add', isAdmin, (req, res) => {
     res.render('createskill', {
         skillTreeName: req.params.skillTreeName,
@@ -77,60 +70,8 @@ router.get('/:skillTreeName/add', isAdmin, (req, res) => {
         admin: req.session.admin, });
 });
 
-// Ruta POST para añadir una nueva habilidad
-router.post('/:skillTreeName/add', isAdmin, (req, res) => {
-    const { skillTreeName } = req.params;
-    const { text, icon } = req.body;
+router.post('/:skillTreeName/add', isAdmin, skillsController.addSkill);
 
-    // Validación: Asegúrate de que el campo text esté presente
-    if (!text) {
-        return res.status(400).send('El campo "text" es obligatorio');
-    }
-
-    // Ruta al archivo JSON
-    const filePath = path.join(__dirname, '..', 'public', 'electronics', 'skills.json');
-
-    // Leer el archivo JSON
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error al leer el archivo JSON:', err);
-            return res.status(500).send('Error interno del servidor');
-        }
-
-        try {
-            // Parsear el contenido del archivo JSON
-            const skills = JSON.parse(data);
-
-            // Calcular el próximo ID
-            const maxId = skills.reduce((max, skill) => Math.max(max, skill.id), 0);
-            const newId = maxId + 1;
-
-            // Crear el nuevo skill
-            const newSkill = {
-                id: newId,
-                text: text, // Preserva saltos de línea en el texto
-                icon: icon || `icon${newId}.svg` // Asigna un icono por defecto si no se proporciona
-            };
-
-            // Agregar el nuevo skill al array
-            skills.push(newSkill);
-
-            // Escribir de nuevo el archivo JSON
-            fs.writeFile(filePath, JSON.stringify(skills, null, 2), 'utf8', (err) => {
-                if (err) {
-                    console.error('Error al escribir en el archivo JSON:', err);
-                    return res.status(500).send('Error interno del servidor');
-                }
-
-                console.log('Nuevo skill agregado:', newSkill);
-                res.redirect(`/skills/${skillTreeName}`);
-            });
-
-        } catch (error) {
-            console.error('Error al procesar los datos del archivo JSON:', error);
-            res.status(500).send('Error interno del servidor');
-        }
-    });
-});
+router.post('/:skillTreeName/delete/:skillID', isAdmin, skillsController.deleteSkill);
 
 module.exports = router;

@@ -4,6 +4,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
+const multer = require('multer');
+const upload = multer();
 
 const indexRouter = require('./routes/index.routes');
 const usersRouter = require('./routes/users.routes');
@@ -16,7 +18,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
@@ -24,6 +26,9 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+
+// Middleware to handle multipart/form-data
+app.use(upload.array());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

@@ -1,39 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Nueva Competencia</title>
+    <title>Añadir nueva competencia</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script type="module" src="/js/createskill.js" defer></script>
 </head>
 <body>
-<h1>Agregar Nueva Competencia</h1>
-<form action="/skills/<%= skillTreeName %>/add" method="post" enctype="multipart/form-data">
-    <div>
-        <label for="text">Nombre de la Competencia:</label>
-        <input type="text" id="text" name="text" required>
-    </div>
-    <div>
-        <label for="description">Descripción:</label>
-        <textarea id="description" name="description" required></textarea>
-    </div>
-    <div>
-        <label for="tasks">Tareas (una por línea):</label>
-        <textarea id="tasks" name="tasks"></textarea>
-    </div>
-    <div>
-        <label for="resources">Recursos (uno por línea):</label>
-        <textarea id="resources" name="resources"></textarea>
-    </div>
-    <div>
-        <label for="score">Puntuación:</label>
-        <input type="number" id="score" name="score" required>
-    </div>
-    <div>
-        <label for="icon">Icono (opcional):</label>
-        <input type="file" id="icon" name="icon">
-    </div>
-    <button type="submit">Añadir Competencia</button>
-</form>
+<%- include('partials/username-display') %>
+<section class="edit-skill-page">
+    <button id="backButton" class="backButton">Volver</button>
+    <header>
+        <h1>Añadir nueva competencia</h1>
+    </header>
+    <form action="/skills/<%= skillTreeName %>/add" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="text">Nombre de la competencia:</label>
+            <input type="text" id="text" name="text" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="tasks">Tareas (una por línea):</label>
+            <textarea id="tasks" name="tasks"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="resources">Recursos (uno por línea):</label>
+            <textarea id="resources" name="resources"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="score">Puntuación:</label>
+            <input type="number" id="score" name="score" required>
+        </div>
+        <div class="form-group">
+            <label for="icon">Icono (opcional):</label>
+            <input type="file" id="icon" name="icon">
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="save-button">Añadir competencia</button>
+        </div>
+    </form>
+</section>
 </body>
 </html>
