@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 
@@ -108,4 +109,52 @@ exports.deleteBadge = (req, res) => {
             res.redirect('/admin/badges');
         });
     });
+};
+
+
+// Mock users database
+const users = {
+    admin: {
+        password: '1234',
+        admin: true
+    },
+    user: {
+        password: '1234',
+        admin: false
+    }
+};
+
+// Convierte el objeto users en un arreglo
+const userList = Object.keys(users).map(key => ({
+    id: key, // Usamos el nombre como ID único
+    username: key,
+    password: users[key].password,
+    admin: users[key].admin
+}));
+
+exports.changePassword = (req, res) => {
+    const { userId, newPassword } = req.body;
+
+    // Validamos que se haya proporcionado un ID de usuario y la nueva contraseña
+    if (!userId || !newPassword) {
+
+        return res.status(400).json({ error: 'Se requieren ambos parámetros: userId y newPassword.' });
+    }
+
+    // Buscar al usuario por su ID
+    const user = userList.find(u => u.id === userId);
+    console.log(user);
+    if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    // Cambiar la contraseña del usuario
+    user.password = newPassword;
+
+    // Enviar respuesta JSON con el resultado del cambio
+    res.json({ message: 'Contraseña cambiada con éxito.', user });
+};
+
+exports.getUserList = (req, res) => {
+        res.render('usercontroller', { users: userList });
 };
