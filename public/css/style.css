@@ -465,6 +465,7 @@ header h1 {
 
 .form-group input[type="text"],
 .form-group input[type="number"],
+.form-group input[type="url"],
 .form-group textarea {
     width: 100%;
     padding: 10px;
@@ -540,6 +541,45 @@ header h1 {
 
 .add-skill-button:hover {
     background-color: #08316b;
+}
+
+/* MANAGE BADGES */
+
+.actions-cell {
+    display: flex;
+    gap: 10px; /* Adjust the gap as needed */
+}
+
+.edit-button {
+    background-color: #4a90e2; /* Blue color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.edit-button:hover {
+    background-color: #357ab8;
+    transform: scale(1.05);
+}
+
+.delete-button {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #c0395f;
+    transform: scale(1.05);
 }
 
 /* ADMIN DASHBOARD */

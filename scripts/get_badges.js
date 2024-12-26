@@ -3,11 +3,9 @@ const path = require("path");
 const {promises: fs} = require("fs");
 const baseurl = "https://raw.githubusercontent.com/Obijuan/digital-electronics-with-open-FPGAs-tutorial/master/rangos/png/";
 
-// Indices del rango de tablas donde se encuentran las medallas
 const indiceTablaInicio = 6;
 const indiceTablaFin = 11;
 
-// Indicamos el directorio donde guardar los iconos y lo creamos si no existe
 const saveDirectory = path.resolve(__dirname, '..', 'public', 'badges');
 (async () => {
     try {
@@ -18,7 +16,7 @@ const saveDirectory = path.resolve(__dirname, '..', 'public', 'badges');
 })();
 
 async function extractTablesInRange(startIndex, endIndex) {
-    const url = 'https://github.com/Obijuan/digital-electronics-with-open-FPGAs-tutorial/wiki#listado-de-rangos'; // Replace with the target URL
+    const url = 'https://github.com/Obijuan/digital-electronics-with-open-FPGAs-tutorial/wiki#listado-de-rangos';
 
     try {
         const browser = await puppeteer.launch();
@@ -26,38 +24,33 @@ async function extractTablesInRange(startIndex, endIndex) {
 
         await page.goto(url, { waitUntil: 'networkidle0' });
 
-        let bitpointCount = 0; // Para determinar el rango de bitpoints de cada medalla
-        let allTablesData = []; // Para guardar los datos de todas las medallas en un único array
+        let bitpointCount = 0;
+        let allTablesData = [];
 
         const { tablesData, updatedBitpointCount } = await page.evaluate(
             (startIndex, endIndex, bitpointCount) => {
-            const tables = document.querySelectorAll('table');
+                const tables = document.querySelectorAll('table');
+                const selectedTables = Array.from(tables).slice(startIndex, endIndex + 1);
 
-            // De todas las tablas, seleccionamos las que están en el rango que queremos
-            const selectedTables = Array.from(tables).slice(startIndex, endIndex + 1);
-
-            const tablesData = selectedTables.map((table) => {
-
-                // Seleccionamos las filas de la tabla
-                const rows = Array.from(table.querySelectorAll('tr'));
-                rows.shift(); // Quitamos la cabecera de la tabla (primera fila)
-                const tableData = rows.map((row) => {
-                    const cells = Array.from(row.querySelectorAll('td, th'));
-                    // Devolvemos los datos necesarios
-                    const rowData = {
-                        "rango": cells[2].innerText.trim(),
-                        "bitpoints-min": bitpointCount.toString(),
-                        "bitpoints-max": (bitpointCount + 9).toString(),
-                        "png": cells[1].querySelector('img').getAttribute('src').split('/').pop()
-                    };
-                    bitpointCount += 10;
-                    return rowData;
+                const tablesData = selectedTables.map((table) => {
+                    const rows = Array.from(table.querySelectorAll('tr'));
+                    rows.shift();
+                    const tableData = rows.map((row) => {
+                        const cells = Array.from(row.querySelectorAll('td, th'));
+                        const rowData = {
+                            "name": cells[2].innerText.trim(),
+                            "bitpoints-min": bitpointCount.toString(),
+                            "bitpoints-max": (bitpointCount + 9).toString(),
+                            "image_url": cells[1].querySelector('img').getAttribute('src').split('/').pop()
+                        };
+                        bitpointCount += 10;
+                        return rowData;
+                    });
+                    return tableData;
                 });
-                return tableData;
-            });
 
-            return { tablesData: tablesData.flat(), updatedBitpointCount: bitpointCount };
-        }, startIndex, endIndex, bitpointCount);
+                return { tablesData: tablesData.flat(), updatedBitpointCount: bitpointCount };
+            }, startIndex, endIndex, bitpointCount);
 
         allTablesData = allTablesData.concat(tablesData);
         bitpointCount = updatedBitpointCount;
@@ -98,8 +91,8 @@ async function downloadAllBadges(badgesData) {
     const page = await browser.newPage();
 
     for (const badge of badgesData) {
-        const badgeUrl = `${baseurl}${badge.png.replace('.png', '-min.png')}`;
-        const fileName = badge.png.replace('.png', '-min.png');
+        const badgeUrl = `${baseurl}${badge.image_url.replace('.png', '-min.png')}`;
+        const fileName = badge.image_url.replace('.png', '-min.png');
         await downloadBadge(page, badgeUrl, fileName);
         await new Promise(resolve => setTimeout(resolve, 1000));
     }

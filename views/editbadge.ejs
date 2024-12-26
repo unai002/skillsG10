@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Badge</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/editbadge.js" defer></script></head>
+<body>
+<%- include('partials/username-display') %>
+<div class="edit-skill-page">
+    <button id="backButton" class="backButton">Volver</button>
+    <header>
+        <h1>Edit Badge: <%= badge.name %></h1>
+    </header>
+    <section class="edit-skill-form">
+        <form action="/admin/badges/edit/<%= badge.name %>" method="post">
+            <div class="form-group">
+                <label for="badgeName">Badge Name:</label>
+                <input type="text" id="badgeName" name="badgeName" value="<%= badge.name %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="minBitpoints">Min Bitpoints:</label>
+                <input type="number" id="minBitpoints" name="minBitpoints" value="<%= badge['bitpoints-min'] %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="maxBitpoints">Max Bitpoints:</label>
+                <input type="number" id="maxBitpoints" name="maxBitpoints" value="<%= badge['bitpoints-max'] %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="imageUrl">Image URL:</label>
+                <input type="text" id="imageUrl" name="imageUrl" value="<%= badge.image_url %>" oninput="updateImagePreview()" required>
+            </div>
+
+            <div class="form-group">
+                <label>Image Preview:</label>
+                <img id="imagePreview" src="/badges/<%= badge.image_url.replace('.png', '-min.png') %>" alt='Image not found' style="max-width: 70px; max-height: 70px;">
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit" class="save-button">Guardar cambios</button>
+            </div>
+        </form>
+    </section>
+</div>
+</body>
+</html>
