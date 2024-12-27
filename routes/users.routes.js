@@ -15,8 +15,6 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/logout', usersController.logout);
-
-
 router.get('/info', usersController.info);
 
 router.post('/register', usersController.register);

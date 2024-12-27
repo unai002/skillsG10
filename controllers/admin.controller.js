@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const fs = require('fs');
-const path = require('path');
+const Badge = require('../models/badge.model'); // Ensure the path is correct
+const User = require('../models/user.model'); // Ensure the path is correct
 
 exports.getAdminDashboard = (req, res) => {
     const username = req.session.username;
@@ -8,24 +8,27 @@ exports.getAdminDashboard = (req, res) => {
     res.render('admindashboard', { username, isAdmin });
 };
 
-exports.getAdminBadges = (req, res) => {
-    const username = req.session.username;
-    const isAdmin = req.session.admin;
-    res.render('adminbadges', {username, admin: isAdmin});
-}
+exports.getAdminBadges = async (req, res) => {
+    try {
+        const badges = await Badge.find().sort({ bitpoints_min: 1 });
+        const username = req.session.username;
+        const isAdmin = req.session.admin;
 
-exports.getEditBadge = (req, res) => {
-    const badgeName = req.params.id;
-    const badgesFilePath = path.join(__dirname, '../public/badges/badges.json');
-
-    fs.readFile(badgesFilePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading badges file:', err);
-            return res.status(500).render('error', { message: 'Internal Server Error', error: err });
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            res.json(badges);
+        } else {
+            res.render('adminbadges', { username, admin: isAdmin, badges });
         }
+    } catch (err) {
+        console.error('Error fetching badges from database:', err);
+        res.status(500).render('error', { message: 'Internal Server Error', error: err });
+    }
+};
 
-        const badges = JSON.parse(data);
-        const badge = badges.find(b => b.name === badgeName);
+exports.getEditBadge = async (req, res) => {
+    try {
+        const badgeName = req.params.id;
+        const badge = await Badge.findOne({ name: badgeName });
 
         if (!badge) {
             const notFoundError = new Error('Badge not found');
@@ -35,126 +38,95 @@ exports.getEditBadge = (req, res) => {
 
         const username = req.session.username;
         const isAdmin = req.session.admin;
-
         res.render('editbadge', { badge, username, admin: isAdmin });
-    });
+    } catch (err) {
+        console.error('Error fetching badge from database:', err);
+        res.status(500).render('error', { message: 'Internal Server Error', error: err });
+    }
 };
 
-exports.updateBadge = (req, res) => {
-    const { id } = req.params;
-    const { badgeName, range, minBitpoints, maxBitpoints, imageUrl } = req.body;
-    const badgesFilePath = path.join(__dirname, '../public/badges/badges.json');
+exports.updateBadge = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { badgeName, minBitpoints, maxBitpoints, imageUrl } = req.body;
 
-    fs.readFile(badgesFilePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error reading badges file');
-        }
+        const updatedBadge = await Badge.findOneAndUpdate(
+            { name: id },
+            {
+                name: badgeName,
+                bitpoints_min: minBitpoints,
+                bitpoints_max: maxBitpoints,
+                image_url: imageUrl
+            },
+            { new: true }
+        );
 
-        let badges = JSON.parse(data);
-        const badgeIndex = badges.findIndex(badge => badge.name === id);
-
-        if (badgeIndex === -1) {
+        if (!updatedBadge) {
             return res.status(404).send('Badge not found');
         }
 
-        const updatedBadge = {
-            ...badges[badgeIndex],
-            name: badgeName,
-            'bitpoints-min': minBitpoints,
-            'bitpoints-max': maxBitpoints,
-            image_url: imageUrl
-        };
-
-        badges[badgeIndex] = updatedBadge;
-
-        fs.writeFile(badgesFilePath, JSON.stringify(badges, null, 2), 'utf8', (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send('Error updating badge');
-            }
-
-            res.redirect('/admin/badges');
-        });
-    });
+        res.redirect('/admin/badges');
+    } catch (err) {
+        console.error('Error updating badge:', err);
+        res.status(500).send('Error updating badge');
+    }
 };
 
-exports.deleteBadge = (req, res) => {
-    const { id } = req.params;
-    const badgesFilePath = path.join(__dirname, '../public/badges/badges.json');
+exports.deleteBadge = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedBadge = await Badge.findOneAndDelete({ name: id });
 
-    fs.readFile(badgesFilePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading badges file:', err);
-            return res.status(500).render('error', { message: 'Internal Server Error', error: err });
-        }
-
-        let badges = JSON.parse(data);
-        const badgeIndex = badges.findIndex(badge => badge.name === id);
-
-        if (badgeIndex === -1) {
+        if (!deletedBadge) {
             const notFoundError = new Error('Badge not found');
             notFoundError.status = 404;
             return res.status(404).render('error', { message: 'Badge not found', error: notFoundError });
         }
 
-        badges.splice(badgeIndex, 1);
-
-        fs.writeFile(badgesFilePath, JSON.stringify(badges, null, 2), 'utf8', (err) => {
-            if (err) {
-                console.error('Error deleting badge:', err);
-                return res.status(500).render('error', { message: 'Error deleting badge', error: err });
-            }
-
-            res.redirect('/admin/badges');
-        });
-    });
-};
-
-
-// Mock users database
-const users = {
-    admin: {
-        password: '1234',
-        admin: true
-    },
-    user: {
-        password: '1234',
-        admin: false
+        res.redirect('/admin/badges');
+    } catch (err) {
+        console.error('Error deleting badge:', err);
+        res.status(500).render('error', { message: 'Error deleting badge', error: err });
     }
 };
 
-// Convierte el objeto users en un arreglo
-const userList = Object.keys(users).map(key => ({
-    id: key, // Usamos el nombre como ID único
-    username: key,
-    password: users[key].password,
-    admin: users[key].admin
-}));
-
-exports.changePassword = (req, res) => {
+exports.changePassword = async (req, res) => {
     const { userId, newPassword } = req.body;
 
-    // Validamos que se haya proporcionado un ID de usuario y la nueva contraseña
+    // Validate that both userId and newPassword are provided
     if (!userId || !newPassword) {
-
-        return res.status(400).json({ error: 'Se requieren ambos parámetros: userId y newPassword.' });
+        return res.status(400).json({ error: 'Both userId and newPassword are required.' });
     }
 
-    // Buscar al usuario por su ID
-    const user = userList.find(u => u.id === userId);
-    console.log(user);
-    if (!user) {
-        return res.status(404).json({ error: 'Usuario no encontrado.' });
+    try {
+        // Find the user by their ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the user's password
+        user.password = hashedPassword;
+        await user.save();
+
+        // Send a JSON response with the result of the change
+        res.redirect('/admin/dashboard');
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    // Cambiar la contraseña del usuario
-    user.password = newPassword;
-
-    // Enviar respuesta JSON con el resultado del cambio
-    res.json({ message: 'Contraseña cambiada con éxito.', user });
 };
 
-exports.getUserList = (req, res) => {
-        res.render('usercontroller', { users: userList });
+exports.getUserList = async (req, res) => {
+    try {
+        const users = await User.find();
+        console.log('Fetched users:', users); // Debug statement
+        res.render('usercontroller', { users });
+    } catch (error) {
+        console.error('Error fetching users from database:', error);
+        res.status(500).render('error', { message: 'Internal Server Error', error });
+    }
 };

@@ -11,13 +11,31 @@ function loadSkillHexagon() {
 
 // Función para cargar la información de la skill dada en la página
 function loadSkillInformation(skillId) {
-    fetch('/electronics/skills.json')
+    fetch('/skills/electronics/info')
         .then(response => response.json())
         .then(skills => {
             const skillFind = skills.find(item => (item.id).toString() === skillId);
             if (skillFind) {
                 let text = (skillFind.text).replace(/\n/g, " ");
                 document.getElementById('title').innerText = 'Skill: ' + text;
+                document.getElementById('skillScore').innerText = `Skill score: ${skillFind.score} points`;
+                document.getElementById('descriptionText').innerText = skillFind.description;
+
+                const taskList = document.querySelector('.checkbox-list');
+                taskList.innerHTML = '';
+                skillFind.tasks.forEach((task, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `<input type="checkbox" class="checkbox" id="task${index + 1}"><label for="task${index + 1}">${task}</label>`;
+                    taskList.appendChild(listItem);
+                });
+
+                const resourceList = document.querySelector('.list');
+                resourceList.innerHTML = '';
+                skillFind.resources.forEach(resource => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = resource;
+                    resourceList.appendChild(listItem);
+                });
             } else {
                 console.log("ERROR: no se ha encontrado la información de la competencia a cargar.");
             }

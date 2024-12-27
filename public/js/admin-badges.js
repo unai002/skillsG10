@@ -7,7 +7,11 @@ function handleBackButton() {
 
 async function loadLeaderboard() {
     try {
-        const response = await fetch('/badges/badges.json');
+        const response = await fetch('/admin/badges', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
         const data = await response.json();
 
         const tbody = document.getElementById('leaderboard-body');
@@ -25,11 +29,11 @@ async function loadLeaderboard() {
             row.appendChild(badgeCell);
 
             const minBitpointsCell = document.createElement('td');
-            minBitpointsCell.textContent = item['bitpoints-min'];
+            minBitpointsCell.textContent = item['bitpoints_min'];
             row.appendChild(minBitpointsCell);
 
             const maxBitpointsCell = document.createElement('td');
-            maxBitpointsCell.textContent = item['bitpoints-max'];
+            maxBitpointsCell.textContent = item['bitpoints_max'];
             row.appendChild(maxBitpointsCell);
 
             const actionsCell = document.createElement('td');

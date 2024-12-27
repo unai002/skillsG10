@@ -1,11 +1,10 @@
-const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
-const multer = require('multer');
-const upload = multer();
+const mongoose = require('mongoose');
+const initializeDB = require('./scripts/initializeDB');
 
 const indexRouter = require('./routes/index.routes');
 const usersRouter = require('./routes/users.routes');
@@ -13,6 +12,17 @@ const skillsRouter = require('./routes/skills.routes');
 const adminRouter = require('./routes/admin.routes');
 
 const app = express();
+
+// Conectar a la base de datos
+mongoose.connect('mongodb://localhost:27017/skillsDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Conectado a la base de datos');
+  initializeDB();
+}).catch(err => {
+  console.error('Error al conectar a la base de datos', err);
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -28,9 +38,7 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// Middleware to handle multipart/form-data
-app.use(upload.array());
-
+// Usa las rutas
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/skills', skillsRouter);
@@ -43,11 +51,8 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });

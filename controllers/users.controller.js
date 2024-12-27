@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const User = require('../models/user.model'); // Import the User model
 
 // Mock users database
 const mockUsers = {
@@ -22,17 +23,32 @@ exports.register = async (req, res) => {
         });
     }
 
-    if (mockUsers[username]) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'El usuario ya está registrado',
-        });
-    }
-
     try {
+        // Check if the user already exists
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'El usuario ya está registrado',
+            });
+        }
+
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-        const isFirstUser = Object.keys(mockUsers).length === 0;
-        mockUsers[username] = { password: hashedPassword, admin: isFirstUser };
+        console.log("register ", hashedPassword)
+
+        // Determine if the user is the first user (admin)
+        const isFirstUser = (await User.countDocuments({})) === 0;
+
+        // Create a new user
+        const newUser = new User({
+            username,
+            password: hashedPassword,
+            admin: isFirstUser
+        });
+
+        // Save the user to the database
+        await newUser.save();
 
         return res.status(201).json({
             status: 'success',
@@ -56,8 +72,26 @@ exports.login = async (req, res) => {
         });
     }
 
-    const user = mockUsers[username];
-    if (user && await bcrypt.compare(password, user.password)) {
+    try {
+        // Find the user in the database
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'El usuario no existe.',
+            });
+        }
+
+        // Compare the provided password with the hashed password in the database
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log("login ", user.password)
+
+        if (!isMatch) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'La contraseña es incorrecta.',
+            });
+        }
 
         req.session.username = username;
         req.session.admin = user.admin;
@@ -66,12 +100,12 @@ exports.login = async (req, res) => {
             status: 'success',
             message: 'Usuario autenticado correctamente'
         });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message: 'Error al autenticar el usuario',
+        });
     }
-
-    return res.status(401).json({
-        status: 'error',
-        message: 'Credenciales incorrectas',
-    });
 };
 
 exports.logout = (req, res) => {

@@ -45,11 +45,6 @@
     "icon": "icon9.svg"
   },
   {
-    "id": 10,
-    "text": "Learn to\nread a schematic",
-    "icon": "icon10.svg"
-  },
-  {
     "id": 11,
     "text": "Learn to read\na datasheet",
     "icon": "icon11.svg"

@@ -18,7 +18,7 @@
         <form action="/skills/<%= skillTreeName %>/edit/<%= skill.skillID %>" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="skillText">Nombre de la competencia:</label>
-                <input type="text" id="skillText" name="skillText" value="<%= skill.skillText %>" required>
+                <input type="text" id="skillText" name="skillText" value="<%= skill.skillText.replace(/\n/g, '\\n') %>" required>
             </div>
 
             <div class="form-group">
@@ -42,8 +42,8 @@
             </div>
 
             <div class="form-group">
-                <label for="iconUpload">Icono (opcional):</label>
-                <input type="file" id="iconUpload" name="iconUpload" accept=".png">
+                <label for="iconUpload">Icon (optional):</label>
+                <input type="file" id="iconUpload" name="icon" accept=".png">
             </div>
 
             <div class="form-buttons">

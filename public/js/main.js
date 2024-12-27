@@ -1,7 +1,7 @@
 // CONSTRUCCIÓN DE LOS HEXÁGONOS
 
 // Obtenemos la información de los skills
-fetch('/electronics/skills.json')
+fetch('/skills/electronics/info')
     .then(response => response.json())
     .then(skills => {
         const svgContainer = document.querySelector('.svg-container');
@@ -11,6 +11,7 @@ fetch('/electronics/skills.json')
             const svgWrapper = document.createElement('div');
             svgWrapper.classList.add('svg-wrapper');
             svgWrapper.setAttribute('data-id', skill.id);
+            svgWrapper.setAttribute('data-description', skill.description);
             svgWrapper.setAttribute('data-custom', 'false');
 
             // SVG
@@ -73,7 +74,7 @@ function eventManager() {
         wrapper.addEventListener('mouseover', () => {
             let banner = document.querySelector('.description-banner');
             banner.style.display = 'block';
-            banner.innerHTML = `Descripción de la tarea: ${wrapper.getAttribute('data-id')}`;
+            banner.innerHTML = `Descripción de la tarea: ${wrapper.getAttribute('data-description')}`;
         });
         wrapper.addEventListener('mouseout', () => {
             document.querySelector('.description-banner').style.display = 'none';

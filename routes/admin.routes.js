@@ -15,7 +15,7 @@ function isAdmin(req, res, next) {
 router.get('/dashboard', isAdmin, adminController.getAdminDashboard);
 router.get('/badges', isAdmin, adminController.getAdminBadges);
 router.get('/badges/edit/:id', isAdmin, adminController.getEditBadge);
-router.get('/change-password', isAdmin, adminController.getUserList);
+router.get('/users', isAdmin, adminController.getUserList);
 
 router.post('/badges/edit/:id', isAdmin, adminController.updateBadge);
 router.post('/badges/delete/:id', isAdmin, adminController.deleteBadge);
