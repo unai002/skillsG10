@@ -36,10 +36,62 @@ function loadSkillInformation(skillId) {
                     listItem.textContent = resource;
                     resourceList.appendChild(listItem);
                 });
+
+                loadUserTasks(skillId); // Para asegurar que los checkboxes están cargados
             } else {
                 console.log("ERROR: no se ha encontrado la información de la competencia a cargar.");
             }
+        })
+        .catch(error => {
+            console.error('Error fetching skills:', error);
         });
+}
+
+// Para cargar la información de las tareas que el usuario actual tiene marcadas
+async function loadUserTasks(skillId) {
+    const checkboxes = document.querySelectorAll('.checkbox');
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const currentUser = userInfo ? userInfo.username : null;
+
+    if (!currentUser) {
+        console.error('User info is missing or invalid');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/skills/electronics/userTasks?skillId=${skillId}&username=${currentUser}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error('Error fetching user tasks');
+        }
+
+        const data = await response.json();
+        const savedTaskStates = data.taskStates;
+
+        if (savedTaskStates) {
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = savedTaskStates[index];
+            });
+        } else {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        checkBoxVerify();
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', checkBoxVerify);
+        });
+    } catch (error) {
+        console.error('Error fetching user tasks:', error);
+    }
 }
 
 // Para llamar cada vez que se marque o desmarque una tarea (checkbox)
@@ -50,7 +102,6 @@ function checkBoxVerify() {
     const textBox = document.getElementById('textBox');
     const buttonSubmit = document.getElementById('buttonSubmit');
 
-    // Si todas están marcadas mostramos el formulario + confetti
     if (allCheck) {
         textBoxTittle.style.display = 'block';
         textBox.style.display = 'block';
@@ -61,65 +112,78 @@ function checkBoxVerify() {
             origin: { y: 0.6 }
         });
     } else {
-        // Si hay alguna sin marcar lo ocultamos
         textBoxTittle.style.display = 'none';
         textBox.style.display = 'none';
         buttonSubmit.style.display = 'none';
     }
 
-    // Actualizamos el estado de las tareas de el usuario actual en localstorage
     const skillId = localStorage.getItem('skillId');
     const taskStates = Array.from(checkboxes).map(checkbox => checkbox.checked);
-    let localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
-    const currentUser = localStorage.getItem('currentUser');
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const currentUser = userInfo ? userInfo.username : null;
+    const skillTreeName = 'electronics';
 
-    if (!localTasksCompleted[skillId]) {
-        localTasksCompleted[skillId] = {};
+    if (!currentUser) {
+        console.error('User info is missing or invalid');
+        return;
     }
 
-    localTasksCompleted[skillId][currentUser] = taskStates;
-    localStorage.setItem('localTasksCompleted', JSON.stringify(localTasksCompleted));
-}
-
-// Para cargar la información de las tareas que el usuario actual tiene marcadas
-function loadUserTasks(skillId) {
-    const checkboxes = document.querySelectorAll('.checkbox');
-    const localTasksCompleted = JSON.parse(localStorage.getItem('localTasksCompleted')) || {};
-    const currentUser = localStorage.getItem('currentUser');
-    // Por cada skill, se guarda un array de booleans que indica las tareas que cada usuario ha completado
-    const savedTaskStates = localTasksCompleted[skillId] ? localTasksCompleted[skillId][currentUser] : null;
-
-    if (savedTaskStates) {
-        // Si ya existe, se checkean las tareas dependiendo de sus valores
-        checkboxes.forEach((checkbox, index) => {
-            checkbox.checked = savedTaskStates[index];
+    fetch(`/skills/${skillTreeName}/updateTasks`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            skillId: skillId,
+            username: currentUser,
+            taskStates: taskStates
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error updating user tasks');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('User tasks updated successfully:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-        checkBoxVerify();
-    } else {
-        // Si no existe, ningún usuario ha checkeado ninguna de las tareas, se inicializan sin marcar
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        checkBoxVerify();
-    }
-
-    // En todas las checkboxes de la página añadimos el listener para llamar a checkBoxVerify cada vez
-    // que alguna checkbox cambie de estado
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', checkBoxVerify);
-    });
 }
 
 // Para cargar la evidencia que el usuario puede haber enviado ya
-function loadEvidence(skillId) {
-    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
-    const currentUser = localStorage.getItem('currentUser');
-    if (evidencias[skillId]) {
-        const userEvidence = evidencias[skillId].find(evidence => evidence.username === currentUser);
-        // Si el usuario ya había enviado una evidencia para la skill, la cargamos en la caja de texto
-        if (userEvidence) {
-            document.getElementById('textBox').value = userEvidence.evidence;
+async function loadEvidence(skillId) {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const currentUser = userInfo ? userInfo.username : null;
+
+    if (!currentUser) {
+        console.error('User info is missing or invalid');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/skills/electronics/getEvidence?skillId=${skillId}&username=${currentUser}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error('Error fetching user evidence');
         }
+
+        const data = await response.json();
+        const userEvidence = data.evidence;
+
+        if (userEvidence) {
+            document.getElementById('textBox').value = userEvidence;
+        }
+    } catch (error) {
+        console.error('Error fetching user evidence:', error);
     }
 }
 
@@ -127,44 +191,49 @@ function loadEvidence(skillId) {
 function handleEvidenceSubmission() {
     const buttonSubmit = document.getElementById('buttonSubmit');
 
-    // Listener cuando el usuario quiera enviar una evidencia
-    buttonSubmit.addEventListener('click', (e) => {
+    buttonSubmit.addEventListener('click', async (e) => {
+        e.preventDefault(); // Prevent form submission
 
-        // Comprobación de que la evidencia no esté vacía
         let evidenceText = document.getElementById('textBox').value.trim();
         if (evidenceText === '') {
             alert('No puedes enviar una evidencia vacía.');
             return;
         }
 
-        let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
         const skillId = localStorage.getItem('skillId');
-        const currentUser = localStorage.getItem('currentUser');
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const currentUser = userInfo ? userInfo.username : null;
+        const skillTreeName = 'electronics';
 
-        if (!evidencias[skillId]) {
-            // Si no existen evidencias para la skill, creamos el array vacío
-            evidencias[skillId] = [];
+        if (!currentUser) {
+            console.error('User info is missing or invalid');
+            return;
         }
 
-        // Entre las evidencias para la skill, buscamos la que el usuario haya enviado (si existe)
-        const userEvidenceIndex = evidencias[skillId].findIndex(evidence => evidence.username === currentUser);
-
-        if (userEvidenceIndex !== -1) {
-            // Si no existe, creamos un objeto nuevo
-            evidencias[skillId][userEvidenceIndex].evidence = evidenceText;
-            evidencias[skillId][userEvidenceIndex].approved = false;
-            evidencias[skillId][userEvidenceIndex].approvals = [];
-        } else {
-            // Si ya existía, la reemplazamos con la nueva y reseteamos las aprobaciones
-            evidencias[skillId].push({
-                username: currentUser,
-                evidence: evidenceText,
-                approved: false,
-                approvals: []
+        try {
+            const response = await fetch(`/skills/${skillTreeName}/submit-evidence`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    skillId: skillId,
+                    evidence: evidenceText,
+                    username: currentUser
+                })
             });
-        }
 
-        localStorage.setItem('evidencias', JSON.stringify(evidencias));
+            if (!response.ok) {
+                throw new Error('Error updating user evidence');
+            }
+
+            const data = await response.json();
+            console.log('User evidence updated successfully:', data);
+
+            location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+        }
     });
 }
 
@@ -177,56 +246,70 @@ function handleBackButton() {
 }
 
 // Para cargar las evidencias enviadas en la tabla de evidencias
-function loadAndDisplayEvidences(skillId) {
+async function loadAndDisplayEvidences(skillId) {
     const evidenceTableContainer = document.getElementById('evidenceTableContainer');
     const evidenceTableBody = document.querySelector('#evidenceTable tbody');
-    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
-    const currentUser = localStorage.getItem('currentUser');
     const currentUserRole = localStorage.getItem('currentUserRole');
 
-    // Si hay alguna evidencia para la skill actual
-    if (evidencias[skillId] && evidencias[skillId].length > 0) {
-        evidencias[skillId].forEach((evidence, index) => {
-            const row = document.createElement('tr');
-            const approvalCount = evidence.approvals ? evidence.approvals.length : 0;
-            // Creamos una fila (row, tr) y dentro las columnas necesarias (td)
-            // Construimos el código HTML para las columnas, incluyendo el usuario y la evidencia (el texto)
-            // En la última columna añadimos un botón para aprobar la evidencia si el usuario NO es admin
-            // Si el usuario ES admin, en la última columna añadimos botones para aprobar o rechazar
-            row.innerHTML = `
-                <td>${evidence.username}</td>
-                <td>${evidence.evidence}</td>
-                <td>
-                    ${evidence.approved ? `
-                        <span class="approved-label">Approved</span>
-                    ` : `
-                        ${currentUserRole === 'admin' ? `
-                            <button class="approve-btn" data-index="${index}">Approve</button>
-                            <button class="reject-btn" data-index="${index}">Reject</button>
+    try {
+        const response = await fetch(`/skills/electronics/getAllEvidences?skillId=${skillId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error('Error fetching evidences');
+        }
+
+        const data = await response.json();
+        const evidences = data.evidences;
+
+        evidenceTableBody.innerHTML = ''; // Clear existing rows
+
+        if (evidences.length > 0) {
+            evidences.forEach((evidence, index) => {
+                const row = document.createElement('tr');
+                const approvalCount = evidence.approvals ? evidence.approvals.length : 0;
+
+                row.innerHTML = `
+                    <td>${evidence.username}</td>
+                    <td>${evidence.evidence}</td>
+                    <td>
+                        ${evidence.approved ? `
+                            <span class="approved-label">Approved</span>
                         ` : `
-                            <button class="approve-btn" data-index="${index}">Approve</button>
+                            ${currentUserRole === 'admin' ? `
+                                <button class="approve-btn" data-index="${index}">Approve</button>
+                                <button class="reject-btn" data-index="${index}">Reject</button>
+                            ` : `
+                                <button class="approve-btn" data-index="${index}">Approve</button>
+                            `}
+                            <span class="approval-count">(${approvalCount} approvals)</span>
                         `}
-                        <span class="approval-count">(${approvalCount} approvals)</span>
-                    `}
-                </td>
-            `;
-            evidenceTableBody.appendChild(row);
-        });
-        evidenceTableContainer.style.display = 'block';
-    } else {
-        // Si no hay evidencias no mostramos la tabla
-        evidenceTableContainer.style.display = 'none';
-    }
+                    </td>
+                `;
+                evidenceTableBody.appendChild(row);
+            });
+            evidenceTableContainer.style.display = 'block';
+        } else {
+            evidenceTableContainer.style.display = 'none';
+        }
 
-    // Añadimos event listeners a los botones creados para llamar a las funciones correspondientes
-    document.querySelectorAll('.approve-btn').forEach(button => {
-        button.addEventListener('click', handleApprove);
-    });
-
-    if (currentUserRole === 'admin') {
-        document.querySelectorAll('.reject-btn').forEach(button => {
-            button.addEventListener('click', handleReject);
+        // Add event listeners to the buttons
+        document.querySelectorAll('.approve-btn').forEach(button => {
+            button.addEventListener('click', handleApprove);
         });
+
+        if (currentUserRole === 'admin') {
+            document.querySelectorAll('.reject-btn').forEach(button => {
+                button.addEventListener('click', handleReject);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching evidences:', error);
     }
 }
 
@@ -283,7 +366,7 @@ function loadInformation() {
     const skillId = localStorage.getItem('skillId');
     loadSkillHexagon();
     loadSkillInformation(skillId);
-    loadUserTasks(skillId);
+    //loadUserTasks(skillId); la llamamos dentro de loadSkillInformation
     loadEvidence(skillId);
     handleEvidenceSubmission();
     handleBackButton();

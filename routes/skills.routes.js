@@ -28,9 +28,14 @@ router.get('/:skillTreeName/view/:skillID', isLoggedIn, skillsController.viewSki
 router.get('/:skillTreeName/edit/:skillID', isAdmin, skillsController.editSkill);
 router.get('/:skillTreeName/add', isAdmin, skillsController.addSkillForm);
 router.get('/:skillTreeName/info', isLoggedIn, skillsController.info);
+router.get('/:skillTreeName/userTasks', isLoggedIn, skillsController.getUserTasks);
+router.get('/:skillTreeName/getEvidence', isLoggedIn, skillsController.getEvidence);
+router.get('/:skillTreeName/getAllEvidences', isLoggedIn, skillsController.getAllEvidences);
 
 router.post('/:skillTreeName/add', isAdmin, skillsController.addSkill);
 router.post('/:skillTreeName/edit/:skillID', isAdmin, skillsController.updateSkill);
 router.post('/:skillTreeName/delete/:skillID', isAdmin, skillsController.deleteSkill);
+router.post('/:skillTreeName/updateTasks', isLoggedIn, skillsController.updateUserTasks);
+router.post('/:skillTreeName/submit-evidence', isLoggedIn, skillsController.submitEvidence);
 
 module.exports = router;
