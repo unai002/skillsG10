@@ -248,8 +248,11 @@ function handleBackButton() {
 // Para cargar las evidencias enviadas en la tabla de evidencias
 async function loadAndDisplayEvidences(skillId) {
     const evidenceTableContainer = document.getElementById('evidenceTableContainer');
+    const evidenceTable = document.getElementById('evidenceTable');
     const evidenceTableBody = document.querySelector('#evidenceTable tbody');
-    const currentUserRole = localStorage.getItem('currentUserRole');
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const currentUser = userInfo ? userInfo.username : null;
+    const admin = userInfo ? userInfo.admin : null;
 
     try {
         const response = await fetch(`/skills/electronics/getAllEvidences?skillId=${skillId}`, {
@@ -265,37 +268,46 @@ async function loadAndDisplayEvidences(skillId) {
         }
 
         const data = await response.json();
-        const evidences = data.evidences;
+        const userskills = data.evidences;
 
-        evidenceTableBody.innerHTML = ''; // Clear existing rows
+        evidenceTableBody.innerHTML = '';
 
-        if (evidences.length > 0) {
-            evidences.forEach((evidence, index) => {
-                const row = document.createElement('tr');
-                const approvalCount = evidence.approvals ? evidence.approvals.length : 0;
+        // Check if there is any evidence text in the userskill objects
+        const hasEvidenceText = userskills.some(userskill => userskill.evidence && userskill.evidence.trim() !== "");
 
-                row.innerHTML = `
-                    <td>${evidence.username}</td>
-                    <td>${evidence.evidence}</td>
+        if (hasEvidenceText) {
+            userskills.forEach((userskill, index) => {
+                if (userskill.evidence && userskill.evidence.trim() !== "") {
+                    const row = document.createElement('tr');
+                    const approvalCount = userskill.approvals;
+                    const userHasApproved = Array.isArray(userskill.verifications) && userskill.verifications.some(verification => {
+                        return verification.username === currentUser;
+                    });
+                    row.innerHTML = `
+                    <td>${userskill.username}</td>
+                    <td>${userskill.evidence}</td>
                     <td>
-                        ${evidence.approved ? `
+                        ${userskill.approved ? `
                             <span class="approved-label">Approved</span>
                         ` : `
-                            ${currentUserRole === 'admin' ? `
-                                <button class="approve-btn" data-index="${index}">Approve</button>
+                            ${admin ? `
+                                <button class="approve-btn" data-index="${index}" ${userHasApproved ? 'disabled' : ''}>Approve</button>
                                 <button class="reject-btn" data-index="${index}">Reject</button>
                             ` : `
-                                <button class="approve-btn" data-index="${index}">Approve</button>
+                                <button class="approve-btn" data-index="${index}" ${userHasApproved ? 'disabled' : ''}>Approve</button>
                             `}
                             <span class="approval-count">(${approvalCount} approvals)</span>
                         `}
                     </td>
                 `;
-                evidenceTableBody.appendChild(row);
+                    evidenceTableBody.appendChild(row);
+                }
             });
             evidenceTableContainer.style.display = 'block';
+            evidenceTable.style.display = 'table';
         } else {
             evidenceTableContainer.style.display = 'none';
+            evidenceTable.style.display = 'none';
         }
 
         // Add event listeners to the buttons
@@ -303,7 +315,7 @@ async function loadAndDisplayEvidences(skillId) {
             button.addEventListener('click', handleApprove);
         });
 
-        if (currentUserRole === 'admin') {
+        if (admin) {
             document.querySelectorAll('.reject-btn').forEach(button => {
                 button.addEventListener('click', handleReject);
             });
@@ -314,51 +326,92 @@ async function loadAndDisplayEvidences(skillId) {
 }
 
 // Para manejar cuando una evidencia es aprobada
-function handleApprove(event) {
-    const skillId = localStorage.getItem('skillId');
-    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
-    const currentUser = localStorage.getItem('currentUser');
-    const currentUserRole = localStorage.getItem('currentUserRole');
-    const index = event.target.getAttribute('data-index');
+async function handleApprove(event) {
+    const skillTreeName = 'electronics'; // Replace with the actual skill tree name if different
+    const skillID = localStorage.getItem('skillId');
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const currentUser = userInfo ? userInfo.username : null;
+    const isAdmin = userInfo ? userInfo.admin : null;
+    const approved = true // estamos aprobando la evidencia con este método
+    const evidenceUser = event.target.parentElement.parentElement.children[0].innerText;
 
-    if (evidencias[skillId][index].username === currentUser) {
-        alert("No puedes aprobar tu propia evidencia.");
+    if (!currentUser) {
+        console.error('User info is missing or invalid');
         return;
     }
 
-    if (currentUserRole === 'admin') {
-        // Si es admin directamente aprueba la evidencia
-        evidencias[skillId][index].approved = true;
-    } else {
-        // Si no es admin sumamos un aprobado, y solo cuando sean 3 se aprobará la evidencia
-        if (!evidencias[skillId][index].approvals) {
-            evidencias[skillId][index].approvals = [];
-        }
-
-        if (!evidencias[skillId][index].approvals.includes(currentUser)) {
-            evidencias[skillId][index].approvals.push(currentUser);
-        }
-
-        if (evidencias[skillId][index].approvals.length >= 3) {
-            evidencias[skillId][index].approved = true;
-        }
+    if (currentUser === evidenceUser) {
+        alert("No puedes aprobar tu propia evidencia.")
+        return;
     }
 
-    localStorage.setItem('evidencias', JSON.stringify(evidencias));
-    location.reload();
+    try {
+        const response = await fetch(`/skills/${skillTreeName}/${skillID}/verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: currentUser,
+                evidenceUsername: evidenceUser,
+                approved: approved,
+                isAdmin: isAdmin
+            })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'Error approving evidence');
+        }
+        console.log('Evidence approved successfully:', data);
+
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message)
+    }
 }
 
 // Para controlar cuando una evidencia es rechazada
-function handleReject(event) {
-    const skillId = localStorage.getItem('skillId');
-    let evidencias = JSON.parse(localStorage.getItem('evidencias')) || {};
-    const index = event.target.getAttribute('data-index');
+async function handleReject(event) {
+    const skillTreeName = 'electronics'; // Replace with the actual skill tree name if different
+    const skillID = localStorage.getItem('skillId');
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const currentUser = userInfo ? userInfo.username : null;
+    const isAdmin = userInfo ? userInfo.admin : null;
+    const approved = false // estamos rechazando la evidencia con este método
+    const evidenceUser = event.target.parentElement.parentElement.children[0].innerText;
 
-    // La eliminamos directamente
-    evidencias[skillId].splice(index, 1);
+    if (!currentUser) {
+        console.error('User info is missing or invalid');
+        return;
+    }
 
-    localStorage.setItem('evidencias', JSON.stringify(evidencias));
-    location.reload();
+    try {
+        const response = await fetch(`/skills/${skillTreeName}/${skillID}/verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: currentUser,
+                evidenceUsername: evidenceUser,
+                approved: approved,
+                isAdmin: isAdmin
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error approving evidence');
+        }
+
+        const data = await response.json();
+        console.log('Evidence rejected successfully:', data);
+
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 // Función principal, carga la información llamando a las funciones anteriores

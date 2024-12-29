@@ -384,6 +384,15 @@ h6 {
     cursor: pointer;
 }
 
+#evidenceTable button:disabled {
+    padding: 5px 10px;
+    margin: 2px;
+    border: none;
+    background-color: #ccc;
+    color: white;
+    cursor: not-allowed;
+}
+
 #evidenceTable button.reject-btn {
     background-color: #f44336;
 }

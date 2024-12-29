@@ -37,5 +37,7 @@ router.post('/:skillTreeName/edit/:skillID', isAdmin, skillsController.updateSki
 router.post('/:skillTreeName/delete/:skillID', isAdmin, skillsController.deleteSkill);
 router.post('/:skillTreeName/updateTasks', isLoggedIn, skillsController.updateUserTasks);
 router.post('/:skillTreeName/submit-evidence', isLoggedIn, skillsController.submitEvidence);
+router.post('/:skillTreeName/:skillID/verify', isLoggedIn, skillsController.verifyEvidence);
+
 
 module.exports = router;

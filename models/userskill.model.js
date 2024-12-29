@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const VerificationSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    approved: { type: Boolean, required: true },
+    username: { type: String },
     verifiedAt: { type: Date, required: true }
 });
 
