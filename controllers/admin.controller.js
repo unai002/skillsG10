@@ -93,26 +93,22 @@ exports.deleteBadge = async (req, res) => {
 exports.changePassword = async (req, res) => {
     const { userId, newPassword } = req.body;
 
-    // Validate that both userId and newPassword are provided
     if (!userId || !newPassword) {
         return res.status(400).json({ error: 'Both userId and newPassword are required.' });
     }
 
     try {
-        // Find the user by their ID
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ error: 'User not found.' });
         }
 
-        // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        // Update the user's password
         user.password = hashedPassword;
         await user.save();
 
-        // Send a JSON response with the result of the change
         res.redirect('/admin/dashboard');
     } catch (error) {
         console.error('Error changing password:', error);

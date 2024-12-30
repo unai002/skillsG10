@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin.controller');
-const usersController = require("../controllers/users.controller");
 
 // Middleware para verificar si el usuario es administrador
 function isAdmin(req, res, next) {
     if (req.session && req.session.admin) {
-        next(); // Si es administrador, continuar
+        next();
     } else {
         res.redirect('/skills/electronics');
     }

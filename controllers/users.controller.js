@@ -13,7 +13,6 @@ exports.register = async (req, res) => {
     }
 
     try {
-        // Check if the user already exists
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.status(400).json({
@@ -22,21 +21,17 @@ exports.register = async (req, res) => {
             });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log("register ", hashedPassword)
 
-        // Determine if the user is the first user (admin)
         const isFirstUser = (await User.countDocuments({})) === 0;
 
-        // Create a new user
         const newUser = new User({
             username,
             password: hashedPassword,
             admin: isFirstUser
         });
 
-        // Save the user to the database
         await newUser.save();
 
         return res.status(201).json({
@@ -62,7 +57,6 @@ exports.login = async (req, res) => {
     }
 
     try {
-        // Find the user in the database
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(401).json({
@@ -71,7 +65,6 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Compare the provided password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
         console.log("login ", user.password)
 
@@ -109,7 +102,7 @@ exports.logout = (req, res) => {
             }
         } else {
             if (!res.headersSent) {
-                res.redirect('/'); // Redirige al usuario a la página de inicio
+                res.redirect('/');
             }
         }
     });
@@ -134,12 +127,12 @@ exports.leaderboard = (req, res) => {
 
 exports.badges = async (req, res) => {
     try {
-        console.log('Fetching badges...'); // Log the start of the function
-        const badges = await Badge.find({}).sort({ bitpoints_min: 1 }); // Sort by bitpoints_min in ascending order
-        console.log('Badges fetched:', badges); // Log the fetched badges
+        console.log('Fetching badges...');
+        const badges = await Badge.find({}).sort({ bitpoints_min: 1 });
+        console.log('Badges fetched:', badges);
         res.json(badges);
     } catch (error) {
-        console.error('Error fetching badges:', error); // Log the error
+        console.error('Error fetching badges:', error);
         res.status(500).json({
             status: 'error',
             message: 'Error al obtener los badges',

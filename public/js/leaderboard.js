@@ -1,19 +1,15 @@
 async function loadLeaderboard() {
     try {
-        // Fetch badges
         const badgesResponse = await fetch('/users/badges');
         const badges = await badgesResponse.json();
 
-        // Fetch all users
         const usersResponse = await fetch('/users/allUsers');
         const users = await usersResponse.json();
 
-        // Filter out admin users
         const nonAdminUsers = users.filter(user => !user.admin);
 
-        // Load range explanations
         const tbody = document.getElementById('leaderboard-body');
-        tbody.innerHTML = ''; // Clear any existing content
+        tbody.innerHTML = '';
         badges.forEach((item, index) => {
             const row = document.createElement('tr');
 
@@ -23,7 +19,7 @@ async function loadLeaderboard() {
 
             const badgeCell = document.createElement('td');
             const img = document.createElement('img');
-            img.src = `/badges/${item.image_url.replace('.png', '-min.png')}`; // Prepend the path and replace .png with -min.png
+            img.src = `/badges/${item.image_url.replace('.png', '-min.png')}`;
             badgeCell.appendChild(img);
             row.appendChild(badgeCell);
 
@@ -38,7 +34,6 @@ async function loadLeaderboard() {
             tbody.appendChild(row);
         });
 
-        // Load leaderboard with users
         const leaderboardTables = document.getElementById('leaderboard-tables');
         leaderboardTables.innerHTML = ''; // Clear any existing content
         for (const badge of badges) {

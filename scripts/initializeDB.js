@@ -82,10 +82,8 @@ async function initializeSkills() {
 
 async function initializeUsers() {
     try {
-        // Hash the password
         const hashedPassword = await bcrypt.hash('1234', 10);
 
-        // Check if admin user exists
         const existingAdmin = await User.findOne({ username: 'admin' });
         if (!existingAdmin) {
             const adminUser = new User({
@@ -99,7 +97,6 @@ async function initializeUsers() {
             console.log('Admin user already exists');
         }
 
-        // Check if regular user exists
         const existingUser = await User.findOne({ username: 'user' });
         if (!existingUser) {
             const regularUser = new User({

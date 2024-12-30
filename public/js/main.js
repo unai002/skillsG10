@@ -123,11 +123,11 @@ function approveEvidence(skillId) {
     const greenDot = svgWrapper.getElementsByClassName('greenNotification')[0];
 
     if (redDot) {
-        redDot.style.display = 'flex'; // No aparece
+        redDot.style.display = 'flex';
     }
 
     if (greenDot) {
-        greenDot.style.display = 'flex'; // Se posiciona en la pantalla
+        greenDot.style.display = 'flex';
     }
 }
 
@@ -141,13 +141,11 @@ async function loadNotificationDots() {
         const skills = await skillsResponse.json();
 
         for (const skill of skills) {
-            // Fetch UserSkills for each skill
             const skillId = skill.id;
             const userSkillsResponse = await fetch(`/skills/electronics/getAllEvidences?skillId=${skillId}`);
             const data = await userSkillsResponse.json();
             const userSkills = data.evidences;
 
-            // Count evidences and approvals
             let evidenceCount = 0;
             let approvalCount = 0;
 
@@ -160,7 +158,6 @@ async function loadNotificationDots() {
                 }
             });
 
-            // Create notification dots only if there are more than 0 evidences
             if (evidenceCount > 0) {
                 const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skill.id}"]`);
                 if (svgWrapper) {
@@ -173,8 +170,6 @@ async function loadNotificationDots() {
                     svgWrapper.appendChild(redDot);
                     svgWrapper.appendChild(greenDot);
 
-                    // If there is any evidence that the current user has published and is approved,
-                    // call the approveEvidence function to color the hexagon green
                     const userEvidence = userSkills.find(evidence => evidence.username === currentUser);
                     if (userEvidence && userEvidence.approved) {
                         approveEvidence(skillId);
@@ -211,10 +206,8 @@ function appendEmoji(svgContent, className) {
 // INICIALIZACIÓN DE LA PÁGINA
 
 window.onload = async function () {
-    // Retrieve user info from localStorage
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
-    // If userInfo is not in localStorage, fetch it from the server
     userInfo = await getUserInfo();
     localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
@@ -222,7 +215,6 @@ window.onload = async function () {
     const currentUserName = userInfo ? userInfo.username : 'Guest';
     console.log("currentUserName", currentUserName);
 
-    // Handle logout button
     const logoutButton = document.getElementById("logoutButton");
     logoutButton.addEventListener('click', async () => {
         try {
@@ -238,7 +230,6 @@ window.onload = async function () {
         }
     });
 
-    // Fetch and append emojis
     const fetchNotebook = fetch('https://www.reshot.com/preview-assets/icons/UVG3NADPR2/note-book-UVG3NADPR2.svg')
         .then(response => {
             if (!response.ok) {

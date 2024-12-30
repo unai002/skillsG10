@@ -18,6 +18,7 @@ const UserSkillSchema = new Schema({
     completedTasks: { type: [Boolean], default: [] }
 });
 
+// Campo "virtual" para obtener el número de verificaciones desde el front end
 UserSkillSchema.virtual('approvals').get(function() {
     return this.verifications.length;
 });

@@ -4,7 +4,7 @@ window.onload = function () {
         const password = document.getElementById('password').value;
 
         const messageDiv = document.getElementById('message');
-        messageDiv.textContent = ''; // Limpiar cualquier mensaje previo
+        messageDiv.textContent = '';
 
         if (!username || !password) {
             messageDiv.textContent = 'Por favor, completa todos los campos.';
@@ -21,17 +21,14 @@ window.onload = function () {
                 body: JSON.stringify({ username, password }),
             });
 
-            const data = await response.json(); // Parsear la respuesta JSON
+            const data = await response.json();
 
             if (response.ok) {
-                // Si la respuesta es exitosa, mostramos mensaje y almacenamos el token
                 messageDiv.textContent = 'Inicio de sesión exitoso';
                 messageDiv.style.color = 'green';
 
-                // Redirigir a la página principal
-                window.location.href = '/skills/'; // Asegúrate de que la ruta sea correcta
+                window.location.href = '/skills/';
             } else {
-                // Si la respuesta no es exitosa, mostrar mensaje de error
                 messageDiv.textContent = data.message || 'Error al iniciar sesión.';
                 messageDiv.style.color = 'red';
             }

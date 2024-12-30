@@ -1,5 +1,3 @@
-// skills.routes.js
-
 const express = require('express');
 const router = express.Router();
 const skillsController = require('../controllers/skills.controller');
@@ -38,6 +36,5 @@ router.post('/:skillTreeName/delete/:skillID', isAdmin, skillsController.deleteS
 router.post('/:skillTreeName/updateTasks', isLoggedIn, skillsController.updateUserTasks);
 router.post('/:skillTreeName/submit-evidence', isLoggedIn, skillsController.submitEvidence);
 router.post('/:skillTreeName/:skillID/verify', isLoggedIn, skillsController.verifyEvidence);
-
 
 module.exports = router;
