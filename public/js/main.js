@@ -122,9 +122,8 @@ function approveEvidence(skillId) {
     const redDot = svgWrapper.getElementsByClassName('redNotification')[0];
     const greenDot = svgWrapper.getElementsByClassName('greenNotification')[0];
 
-    // Utilizamos la propiedad de estilo "display" para hacer los elementos aparecer y desaparecer
     if (redDot) {
-        redDot.style.display = 'none'; // No aparece
+        redDot.style.display = 'flex'; // No aparece
     }
 
     if (greenDot) {
@@ -133,44 +132,58 @@ function approveEvidence(skillId) {
 }
 
 // Para crear los puntos de notificaciones en los hexágonos de skills
-function loadNotificationDots() {
-    // Obtenemos el array donde se guarda la información de las evidencias y el usuario
-    let evidencias = localStorage.getItem('evidencias');
-    const currentUser = localStorage.getItem('currentUser');
-
+async function loadNotificationDots() {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const currentUser = userInfo ? userInfo.username : null;
     try {
-        evidencias = JSON.parse(evidencias) || {};
-    } catch (error) {
-        console.error('Error parsing JSON data:', error);
-        return;
-    }
+        // Fetch all skills
+        const skillsResponse = await fetch('/skills/electronics/info');
+        const skills = await skillsResponse.json();
 
-    for (let skillId in evidencias) {
-        // Por cada skill contamos las evidencias
-        const evidenceList = evidencias[skillId];
-        const evidenceCount = evidenceList.length;
+        for (const skill of skills) {
+            // Fetch UserSkills for each skill
+            const skillId = skill.id;
+            const userSkillsResponse = await fetch(`/skills/electronics/getAllEvidences?skillId=${skillId}`);
+            const data = await userSkillsResponse.json();
+            const userSkills = data.evidences;
 
-        // Si hay alguna evidencia, se crean los círculos de notificación
-        if (evidenceCount > 0) {
-            const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skillId}"]`);
-            if (svgWrapper) {
-                const redDot = document.createElement('div');
-                const greenDot = document.createElement('div');
-                redDot.classList.add('redNotification');
-                greenDot.classList.add('greenNotification');
-                redDot.innerText = evidenceCount;
-                greenDot.innerText = evidenceCount;
-                svgWrapper.appendChild(redDot);
-                svgWrapper.appendChild(greenDot);
+            // Count evidences and approvals
+            let evidenceCount = 0;
+            let approvalCount = 0;
 
-                // Si hay alguna evidencia que el usuario actual ha publicado y está aprobada,
-                // llamamos a la función approveEvidence que coloreará el hexágono en verde
-                const userEvidence = evidenceList.find(evidence => evidence.username === currentUser);
-                if (userEvidence && userEvidence.approved) {
-                    approveEvidence(skillId);
+            userSkills.forEach(userSkill => {
+                if (userSkill.evidence) {
+                    evidenceCount++;
+                    if (userSkill.username === currentUser) {
+                        approvalCount += userSkill.approvals;
+                    }
+                }
+            });
+
+            // Create notification dots only if there are more than 0 evidences
+            if (evidenceCount > 0) {
+                const svgWrapper = document.querySelector(`.svg-wrapper[data-id="${skill.id}"]`);
+                if (svgWrapper) {
+                    const redDot = document.createElement('div');
+                    const greenDot = document.createElement('div');
+                    redDot.classList.add('redNotification');
+                    greenDot.classList.add('greenNotification');
+                    redDot.innerText = evidenceCount;
+                    greenDot.innerText = approvalCount;
+                    svgWrapper.appendChild(redDot);
+                    svgWrapper.appendChild(greenDot);
+
+                    // If there is any evidence that the current user has published and is approved,
+                    // call the approveEvidence function to color the hexagon green
+                    const userEvidence = userSkills.find(evidence => evidence.username === currentUser);
+                    if (userEvidence && userEvidence.approved) {
+                        approveEvidence(skillId);
+                    }
                 }
             }
         }
+    } catch (error) {
+        console.error('Error loading notification dots:', error);
     }
 }
 
@@ -224,16 +237,6 @@ window.onload = async function () {
             console.error('Error during logout:', error);
         }
     });
-
-    const createButton = document.getElementById('createButton');
-    if (createButton) {
-        createButton.addEventListener('click', () => {
-            const skillTreeName = 'electronics'; // El nombre del árbol de habilidades
-
-            // Redirige al formulario para añadir una nueva habilidad
-            window.location.href = `/skills/${skillTreeName}/add`; // Redirige a la página de creación
-        });
-    }
 
     // Fetch and append emojis
     const fetchNotebook = fetch('https://www.reshot.com/preview-assets/icons/UVG3NADPR2/note-book-UVG3NADPR2.svg')

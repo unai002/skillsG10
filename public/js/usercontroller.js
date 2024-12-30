@@ -1,3 +1,10 @@
+function handleBackButton() {
+    const backButton = document.getElementById('backButton');
+    backButton.addEventListener('click', () => {
+        window.location.href = '/admin/dashboard';
+    });
+}
+
 window.onload = () => {
     // Función para mostrar/ocultar el formulario de cambio de contraseña
     const togglePasswordForm = (userId) => {
@@ -15,4 +22,6 @@ window.onload = () => {
             togglePasswordForm(userId);
         });
     });
+
+    handleBackButton();
 };

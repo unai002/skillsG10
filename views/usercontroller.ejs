@@ -8,37 +8,47 @@
     <script src="/js/usercontroller.js"></script>
 </head>
 <body>
-<h1>Gestión de Usuarios</h1>
-<table border="1" style="width: 100%; border-collapse: collapse;">
-    <thead>
-    <tr>
-        <th>Nombre de Usuario</th>
-        <th>¿Es Admin?</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% users.forEach(user => { %>
+<%- include('partials/username-display') %>
+<div class="edit-skill-page">
+    <button id="backButton" class="backButton">Volver</button>
+    <h1>Gestión de usuarios</h1>
+    <table class="leaderboard-table">
+        <thead>
         <tr>
-            <td><%= user.username %></td>
-            <td><%= user.admin ? 'Sí' : 'No' %></td>
-            <td>
-                <!-- Botón para mostrar el formulario de cambio de contraseña -->
-                <button data-user-id="<%= user.id %>">Cambiar Contraseña</button>
-            </td>
+            <th>Nombre de Usuario</th>
+            <th>¿Es Admin?</th>
+            <th>Acciones</th>
         </tr>
-        <!-- Formulario de cambio de contraseña debajo de la fila del usuario -->
-        <tr id="password-form-<%= user.id %>" style="display: none;">
-            <td colspan="3" style="padding: 10px; background-color: #f9f9f9;">
-                <form action="/admin/change-password" method="POST">
-                    <input type="hidden" name="userId" value="<%= user.id %>"/>
-                    <input type="password" name="newPassword" placeholder="Nueva contraseña" required />
-                    <button type="submit">Confirmar Cambio</button>
-                </form>
-            </td>
-        </tr>
-    <% }); %>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        <% users.forEach(user => { %>
+            <tr>
+                <td><%= user.username %></td>
+                <td><%= user.admin ? 'Sí' : 'No' %></td>
+                <td>
+                    <!-- Botón para mostrar el formulario de cambio de contraseña -->
+                    <div class="form-buttons">
+                        <button data-user-id="<%= user.id %>" class="edit-button">Cambiar contraseña</button>
+                    </div>
+                </td>
+            </tr>
+            <!-- Formulario de cambio de contraseña debajo de la fila del usuario -->
+            <tr id="password-form-<%= user.id %>" style="display: none;">
+                <td colspan="3" style="padding: 10px; background-color: #f9f9f9;">
+                    <form action="/admin/change-password" method="POST">
+                        <input type="hidden" name="userId" value="<%= user.id %>"/>
+                        <div class="form-group">
+                            <input class="" type="password" name="newPassword" placeholder="Nueva contraseña" required/>
+                        </div>
+                        <div class="form-buttons">
+                            <button class="save-button" type="submit">Confirmar Cambio</button>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        <% }); %>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

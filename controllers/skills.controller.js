@@ -469,17 +469,19 @@ exports.verifyEvidence = async (req, res) => {
 
         if (approved) {
             if (isAdmin) {
-                // If the user is an admin, set the verified attribute to true
                 userSkill.verified = approved;
+                userSkill.verifications.push({user: approvingUser._id, username: approvingUser.username, verifiedAt: new Date()});
+                evidenceUser.score += skill.score;
             } else {
-                // If the user is not an admin, add a verification object
                 userSkill.verifications.push({user: approvingUser._id, username: approvingUser.username, verifiedAt: new Date()});
                 if (userSkill.approvals === 3) {
                     userSkill.verified = true;
+                    evidenceUser.score += skill.score;
                 }
             }
 
             await userSkill.save();
+            await evidenceUser.save();
 
             console.log('UserSkill verified status updated:', userSkill);
             res.status(200).json({message: 'Evidence verified successfully', userSkill});

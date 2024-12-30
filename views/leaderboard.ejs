@@ -4,21 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/leaderboard.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/leaderboard.js"></script>
 </head>
 <body>
-<h1 class="leaderboard-title">Leaderboard</h1>
-<table class="leaderboard-table">
-    <thead>
-    <tr>
-        <th class="leaderboard-rango">Rango</th>
-        <th class="leaderboard-badge">Badge</th>
-        <th class="leaderboard-bitpoints">Required Bitpoints</th>
-    </tr>
-    </thead>
-    <tbody id="leaderboard-body">
-    </tbody>
-</table>
+<%- include('partials/username-display') %>
+<div class="edit-skill-page">
+    <h1 class="leaderboard-title">Leaderboard</h1>
+    <div id="leaderboard-tables"></div>
+    <h1 class="leaderboard-title">Range explanations</h1>
+    <table class="leaderboard-table">
+        <thead>
+        <tr>
+            <th class="leaderboard-rango">Rango</th>
+            <th class="leaderboard-badge">Badge</th>
+            <th class="leaderboard-bitpoints">Required Bitpoints</th>
+        </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

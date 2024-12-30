@@ -121,10 +121,12 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.getUserList = async (req, res) => {
+    const username = req.session.username;
+    const isAdmin = req.session.admin;
     try {
         const users = await User.find();
-        console.log('Fetched users:', users); // Debug statement
-        res.render('usercontroller', { users });
+        console.log('Fetched users:', users);
+        res.render('usercontroller', { users, username, admin: isAdmin });
     } catch (error) {
         console.error('Error fetching users from database:', error);
         res.status(500).render('error', { message: 'Internal Server Error', error });

@@ -1,17 +1,6 @@
 const bcrypt = require('bcrypt');
-const User = require('../models/user.model'); // Import the User model
-
-// Mock users database
-const mockUsers = {
-    admin: {
-        password: bcrypt.hashSync('1234', 10),
-        admin: true
-    },
-    user: {
-        password: bcrypt.hashSync('1234', 10),
-        admin: false
-    }
-};
+const User = require('../models/user.model');
+const Badge = require('../models/badge.model');
 
 exports.register = async (req, res) => {
     const { username, password } = req.body;
@@ -124,6 +113,38 @@ exports.logout = (req, res) => {
             }
         }
     });
+};
+
+exports.allUsers = async (req, res) => {
+    try {
+        const users = await User.find({});
+        res.json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Error fetching users',
+        });
+    }
+};
+
+exports.leaderboard = (req, res) => {
+    res.render('leaderboard', {username: req.session.username, admin: req.session.admin});
+}
+
+exports.badges = async (req, res) => {
+    try {
+        console.log('Fetching badges...'); // Log the start of the function
+        const badges = await Badge.find({}).sort({ bitpoints_min: 1 }); // Sort by bitpoints_min in ascending order
+        console.log('Badges fetched:', badges); // Log the fetched badges
+        res.json(badges);
+    } catch (error) {
+        console.error('Error fetching badges:', error); // Log the error
+        res.status(500).json({
+            status: 'error',
+            message: 'Error al obtener los badges',
+        });
+    }
 };
 
 exports.info = async (req, res) => {
